@@ -5,5 +5,5 @@ class Player < ApplicationRecord
          :recoverable, :rememberable, :trackable, :validatable
 
   has_many :cards
-  belongs_to :table
+  belongs_to :table, optional: true
 end
