@@ -12,6 +12,11 @@ class CardsController < ApplicationController
     render json: current_user.card_count, status: 200
   end
 
+  def newGame
+    $redis.sadd("newGame", card_ids)
+    # $redis.smembers("newGame")
+  end
+
   private
 
   def current_user_card
