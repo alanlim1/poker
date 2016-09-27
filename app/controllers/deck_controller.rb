@@ -24,9 +24,13 @@ class DeckController < ApplicationController
     Table.player_id.count
   end
 
-  def player
-    @player = Player.find_by(params: player_id)
-    @activeplayers = @player.table
-  end
+  # def player
+  #   @player = Player.find_by(params: player_id)
+  #   @activeplayers = $
+  #   @activeplayers.order(:timestamp_entered_table)
+  # end
 
+  if current_user == true || user_signed_in?
+    $redis.set("Game", current_user.id)
+  end  
 end
