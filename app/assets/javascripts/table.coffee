@@ -1,5 +1,3 @@
-
-
 tableChannelFunctions = () ->
   if $('.table-container').length > 0
     App.table_channel = App.cable.subscriptions.create {

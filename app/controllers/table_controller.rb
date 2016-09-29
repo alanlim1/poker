@@ -8,9 +8,10 @@ class TableController < ApplicationController
       player = current_player.email
       ActionCable.server.broadcast "table_channel", email: player, body:"testingowkr"
     else
+      if player_signed_in? == false
       TableBroadcastJob.perform_later(current_player)
+      end
     end
-
   end
 
 end
