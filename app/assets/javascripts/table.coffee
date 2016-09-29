@@ -1,18 +1,31 @@
 
 
-tableChannelFunctions = () ->
-  if $('.table-container').length > 0
-    App.table_channel = App.cable.subscriptions.create {
-        channel: "TableChannel"
-    },
 
-    connected: () ->
-      console.log("Connected");
+joinTable = () ->
+  App.table_channel = App.cable.subscriptions.create {
+      channel: "TableChannel"
+  },
 
-    disconnected: () ->
-      console.log("Disconnected");
+  connected: () ->
+    console.log("Connected")
+    $("#not-joined").hide()
+    $("#joined").show()
 
-    received: (data) ->
-      console.log("Player has left");
+  disconnected: () ->
+    console.log("Disconnected")
+    $("#not-joined").show()
+    $("#joined").hide()
 
-$(document).on 'turbolinks:load', tableChannelFunctions
+  received: (data) ->
+    console.log(data)
+
+leaveTable = () ->
+  console.log(App.table_channel)
+  App.cable.subscriptions.remove(App.table_channel);
+  App.cable.deleteConsumer
+
+$(document).on 'turbolinks:load', () ->
+  $('.join-link').on 'ajax:beforeSend', joinTable
+  $('.leave-link').on 'ajax:beforeSend', leaveTable
+  $("#not-joined").show()
+  $("#joined").hide()

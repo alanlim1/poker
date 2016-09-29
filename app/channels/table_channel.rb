@@ -4,6 +4,5 @@ class TableChannel < ApplicationCable::Channel
   end
 
   def unsubscribed
-    current_player.disappear
   end
 end
