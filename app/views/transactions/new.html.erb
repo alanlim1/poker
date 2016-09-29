@@ -1,6 +1,7 @@
-<h2>New Transaction</h2>
+<h2 class="text-center"> New Transaction</h2>
 
-<div class="container">
+<div class="container text-center">
+
   <%= form_for(:payment, url: transactions_path, method: :post, html: { id: 'payment-form'}) do |f|%>
     <div class="form-group">
       <div id="#dropin-container">
@@ -12,10 +13,10 @@
     </div>
   <% end %>
 
-<script type="text/javascript">
-  braintree.setup("<%=@token%>", 'dropin', {
-    container:'#dropin-container',
-    form: 'payment-form'
-  });
-</script>
+  <script type="text/javascript">
+    braintree.setup("<%=@token%>", 'dropin', {
+      container:'#dropin-container',
+      form: 'payment-form'
+    });
+  </script>
 </div>
