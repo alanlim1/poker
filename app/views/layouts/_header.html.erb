@@ -1,8 +1,25 @@
-<ul class="right">
-  <%if signed_in?%>
-    <li><%=link_to current_user.email, edit_user_registration_path%></li>
-    <li><%=link_to "Logout", destroy_user_session_path, method: :delete%></li>
-  <%else%>
-    <li><%=link_to "Register", new_user_registration_path%></li>
-    <li><%=link_to "Login", new_user_session_path%></li>
-  <%end%>
+  <nav class="navbar navbar-default navbar-fixed-top header" role="navigation">
+    <div class="container">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand font" href="/">
+          <span><%= image_tag 'poker_logo.png', height: 27 %></span>
+          <span>Poker Dreams</span>
+        </a>
+      </div>
+      <div class="collapse navbar-collapse">
+        <ul class="nav navbar-nav navbar-right">
+          <li><%=link_to "Checkout", new_transaction_path%></li>
+          <!-- <li><%=link_to "Login", new_player_session_path%></li> -->
+          <li><%= link_to "Login", '#', class: 'user-login', data: { toggle: 'modal', target: '#login' } %></li>
+          <li><%=link_to "Register", new_player_registration_path%></li>
+          <li><%=link_to "Logout", destroy_player_session_path, method: :delete%></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
