@@ -1,9 +1,3 @@
-test
-
-<%=link_to "Logout", destroy_player_session_path, method: :delete%>
-<%=link_to "Login", player_session_path, method: :post%>
-<%=link_to "Join", join_path%>
-
 <% if current_player %>
 <div id="not-joined">
   <%= link_to "Join", join_path, remote: true, class: 'join-link' %>
@@ -14,4 +8,3 @@ test
   </div>
 </div>
 <% end %>
-
