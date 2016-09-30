@@ -6,13 +6,5 @@ class TableController < ApplicationController
   end
 
   def join
-    TableBroadcastJob.perform_later({
-        :type => "PLAYER_JOINED",
-        :payload => { :player => {
-          :id => current_player.id,
-          :name => current_player.email
-          }
-        }
-      })
   end
 end

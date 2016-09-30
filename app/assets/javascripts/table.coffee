@@ -1,11 +1,9 @@
 
-playerJoined = (message) ->
-  $("#players").append("<div id=#{message.player.id}>#{message.player.name}</div>")
-
-
-playerLeft = (message) ->
-  $("#players ##{message.player.id}").remove()
-
+joinLeaveEvent = (message) ->
+  players_html = "";
+  for player in message.players
+    players_html += "<div id=#{player.id}>#{player.name}</div>"
+  $("#players").html(players_html)
 
 joinTable = () ->
   App.table_channel = App.cable.subscriptions.create {
@@ -25,13 +23,11 @@ joinTable = () ->
   received: (message) ->
     console.log(message)
     switch message.type
-      when "PLAYER_JOINED" then playerJoined message.payload
-      when "PLAYER_LEFT" then playerLeft message.payload
+      when "JOIN_LEAVE_EVENT" then joinLeaveEvent message.payload
 
 leaveTable = () ->
   console.log(App.table_channel)
   App.cable.subscriptions.remove(App.table_channel)
-  # App.cable.disconnect()
   $("#not-joined").show()
   $("#joined").hide()
 
