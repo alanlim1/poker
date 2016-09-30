@@ -59,11 +59,17 @@
   position: absolute;
   right: 0;
   left: 0;
+  padding-top: 0.5%;
 }
 
-.form-container {
-    flex: 0 0 200px;
-    margin: 5px;
-    padding: 20px;
-    border: 4px solid darkolivegreen;
+.modal-content  {
+    -webkit-border-radius: 0px !important;
+    -moz-border-radius: 0px !important;
+    border-radius: 30px !important;
+    opacity: 0.8;
+    background-color: thistle;
+}
+
+.modal-dialog {
+  padding-top: 12%;
 }
