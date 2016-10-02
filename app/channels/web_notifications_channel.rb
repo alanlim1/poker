@@ -34,12 +34,25 @@ class WebNotificationsChannel < ApplicationCable::Channel
     # player_ids.each_with_index do |element, index|
     #   $redis.sadd("holey", {player_ids[index] => hole[index]}) 
     # end
+    playerHand = []
+    # holecards = $redis.smembers("holey")
 
-    holecards = $redis.smembers("holey")
+    # hole.each_with_index do |onehole, index|
+
+      # player_ids.each do |player_id|
+      #   player = Player.find_by(id: player_id)
+      #   if player.hole == nil
+      #     player.hole = ""
+      #   end
+
+        player_ids.each_with_index do |element, index|
+          player_ids[index] << hole[index].to_s
+        end
+        playerHand.push({:hole => player_ids})
 
     WebNotificationsBroadcastJob.perform_later({
         :type => "GAME_START_EVENT",
-        :payload => { :hole => holecards }
+        :payload => { :playerHand => playerHand }
       })
     # binding.pry
   end

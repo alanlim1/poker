@@ -1,7 +1,7 @@
 dealHoleEvent = (message) ->
   players_html = "";
-  for player in message.players
-    players_html += "<div id=#{player.id}>#{player.name}</div>"
+  for player in message.playerHand
+    players_html += "<div id=#{player.id}>#{player.name}#{player.hole}</div>"
   $("#players").html(players_html)
 
 startGame = () ->

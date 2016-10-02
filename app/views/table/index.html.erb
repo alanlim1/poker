@@ -9,7 +9,7 @@
 </div>
 
 <div id="start">
-  <% if $redis.smembers("players").count >= 0 %> 
+  <% if $redis.smembers("players").count >= 1 %> 
   <%= link_to "Start", start_path, remote: true, class: 'start-link' %>
   <a href="#" class="leave-game-link">Quit/Leave Game</a>
     <% end %>
