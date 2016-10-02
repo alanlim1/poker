@@ -1,17 +1,3 @@
-tableChannelFunctions = () ->
-  if $('.table-container').length > 0
-    App.table_channel = App.cable.subscriptions.create {
-        channel: "TableChannel"
-    },
-
-# <<<<<<< HEAD
-# playerJoined = (message) ->
-#   $("#players").append("<div id=#{message.player.id}>#{message.player.name}</div>")
-
-# playerLeft = (message) ->
-#   $("#players ##{message.player.id}").remove()
-
-# =======
 joinLeaveEvent = (message) ->
   players_html = "";
   for player in message.players

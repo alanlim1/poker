@@ -1,10 +1,6 @@
 class TableChannel < ApplicationCable::Channel
   def subscribed
     stream_from "table_channel"
-# <<<<<<< HEAD
-#     #TODO: broadcast message that contains all existing subscribers
-#     stream_from "web_notifications_channel"
-# =======
     $redis.sadd("players", connection.current_player.id)
     notify_players
   end

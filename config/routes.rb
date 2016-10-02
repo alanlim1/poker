@@ -5,6 +5,7 @@ Rails.application.routes.draw do
   root to: "table#index"
   get :join, to: "table#join"
   get :leave, to: "table#leave"
+  get :start, to: "table#start"
   
   devise_for :players,
     controllers: {
