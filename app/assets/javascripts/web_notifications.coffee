@@ -1,8 +1,8 @@
 dealHoleEvent = (message) ->
-  players_html = "";
-  for player in message.playerHand
-    players_html += "<div id=#{player.id}>#{player.name}#{player.hole}</div>"
-  $("#players").html(players_html)
+  cards_html = "";
+  for commoncards in message.commoncards
+    cards_html += "#{commoncards}"
+  $("#commoncards").html(cards_html)
 
 startGame = () ->
   App.web_notifications_channel = App.cable.subscriptions.create {
@@ -25,6 +25,7 @@ startGame = () ->
 
   received: (message) ->
     console.log(message)
+    $('#commoncards').append message['message']
     switch message.type
       when "GAME_START_EVENT" then dealHoleEvent message.payload
 

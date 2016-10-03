@@ -5,6 +5,7 @@ class WebNotificationsChannel < ApplicationCable::Channel
   end
 
   def unsubscribed
+    $redis.srem("players", connection.current_player.id)
   end
 
   private 
@@ -14,8 +15,8 @@ class WebNotificationsChannel < ApplicationCable::Channel
 
   def hole
 
-    faces=%w[A K Q J T 9 8 7 6 5 4 3 2]
-    suits=%w[c d h s]
+    faces = %w[A K Q J T 9 8 7 6 5 4 3 2]
+    suits = %w[c d h s]
 
     deck = []
 
@@ -46,28 +47,30 @@ class WebNotificationsChannel < ApplicationCable::Channel
       #   end
 
     player_ids.each_with_index do |element, index|
-      $redis.sadd("allhands", {player_ids[index] => hole[index]} )
+      # $redis.sadd("allholes", {player_ids[index] => hole[index]})
       player_ids[index] << hole[index].to_s
     end
 
-    playerHand = []
-    playerHand.push({:hole => player_ids})
+    $redis.sadd("allholes", player_ids)
+    allholes = $redis.smembers("allholes")
 
     flop = Array.new(3) { deck.shift }
     burn = deck.shift
     turn = Array.new(1) { deck.shift }
     burn
     river = Array.new(1) { deck.shift }
-    commoncards = $redis.sadd("commoncards", flop+turn+river)
+    
+    $redis.sadd("commoncards", flop+turn+river)
+    commoncards = $redis.smembers("commoncards")
 
-    cheatsheet = $redis.sadd("god", flop+turn+river + hole)
+    $redis.sadd("god", flop+turn+river + player_ids)
+    god = $redis.smembers("god")
 
     WebNotificationsBroadcastJob.perform_later({
         :type => "GAME_START_EVENT",
-        :payload => { :playerHand => playerHand, :commoncards => flop+turn+river }
+        :payload => { :playerHand => allholes, :commoncards => flop+turn+river }
       })
   end
-
   # def deal_hole
   #   player_ids = $redis.smembers("players")
   #   hole = []
