@@ -5,7 +5,8 @@ class WebNotificationsChannel < ApplicationCable::Channel
   end
 
   def unsubscribed
-    $redis.srem("players", connection.current_player.id)
+    # $redis.srem("players", connection.current_player.id)
+    $redis.flushdb
   end
 
   private 
@@ -68,7 +69,7 @@ class WebNotificationsChannel < ApplicationCable::Channel
 
     WebNotificationsBroadcastJob.perform_later({
         :type => "GAME_START_EVENT",
-        :payload => { :playerHand => allholes, :commoncards => flop+turn+river }
+        :payload => { :playerHand => allholes, :commoncards => flop + turn + river }
       })
   end
   # def deal_hole
