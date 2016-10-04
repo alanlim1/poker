@@ -1,3 +1,15 @@
+dealHoleEvent = (message) ->
+  hole_html = "";
+  for allholes in message.allholes
+    hole_html += "#{allholes}"
+  $("#playerHand").html(hole_html)
+
+dealCommonCardsEvent = (message) ->
+  cards_html = "";
+  for commoncards in message.commoncards
+    cards_html += "#{commoncards}"
+  $("#commoncards").html(cards_html)
+
 startGame = () ->
   App.player_channel = App.cable.subscriptions.create {
       channel: "PlayerChannel"
