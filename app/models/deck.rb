@@ -1,17 +1,16 @@
 class Deck < ApplicationRecord
+  # faces = %w[A K Q J T 9 8 7 6 5 4 3 2]
+  # suits = %w[c d h s]
 
-  FACES="AKQJT98765432"
-  SUITS="cdhs"
+  # @deck = []
 
-  deck = []
-  FACES.each_byte do |f|
-    SUITS.each_byte do |s|
-      deck.push(f.chr + s.chr)
-    end
-  end
+  # faces.each do |f|
+  #   suits.each do |s|
+  #     @deck.push(f + s)
+  #   end
+  # end
 
-  3.times do
-    deck.shuffle!
-  end
-  
+  # 3.times do
+  #   @deck.shuffle!
+  # end
 end

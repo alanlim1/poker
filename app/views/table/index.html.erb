@@ -1,0 +1,25 @@
+<% if current_player %>
+<div id="not-joined">
+  <%= link_to "Join", join_path, remote: true, class: 'join-link' %>
+</div>
+<div id="joined">
+  <a href="#" class="leave-link">Leave</a>
+  <div id="players">
+  </div>
+</div>
+
+<div id="start">
+  <% if $redis.smembers("players").count >= 0 %> 
+  <%= link_to "Start", start_path, remote: true, class: 'start-link' %>
+  <a href="#" class="leave-game-link">Quit/Leave Game</a>
+  <% end %>
+</div>
+
+<div id="commoncards">
+</div>
+
+<div id="playerHand">
+</div>
+
+
+<% end %>
