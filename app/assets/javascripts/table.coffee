@@ -1,3 +1,20 @@
+dealHoleEvent = (message) ->
+  hole_html = "";
+  for allholes in message.allholes
+    hole_html += "#{allholes}"
+  $("#playerHand").html(hole_html)
+
+dealCommonCardsEvent = (message) ->
+  cards_html = "";
+  for commoncards in message.commoncards
+    cards_html += "#{commoncards}"
+  $("#commoncards").html(cards_html)
+
+startGame = () ->
+  App.player_channel = App.cable.subscriptions.create {
+      channel: "PlayerChannel"
+  },
+
 joinLeaveEvent = (message) ->
   players_html = "";
   for player in message.players
@@ -23,6 +40,8 @@ joinTable = () ->
     console.log(message)
     switch message.type
       when "JOIN_LEAVE_EVENT" then joinLeaveEvent message.payload
+      when "GAME_START_EVENT" then dealHoleEvent message.payload
+      when "DEAL_COMMON_CARDS_EVENT" then dealCommonCardsEvent message.payload
       # when "pre_bet" then pre_betEvent message.payload
       # when "bet" then betEvent message.payload
       # when "fold" then foldEvent message.payload

@@ -63,18 +63,17 @@ class PlayerChannel < ApplicationCable::Channel
       #     player.hole = ""
       #   end
 
-    player_ids.each_with_index do |element, index|
+    allholes = {}
+    player_ids.each_with_index do |id, index|
       # $redis.sadd("allholes", {player_ids[index] => hole[index]})
-      player_ids[index] << hole[index].to_s
+      allholes[id] = hole[index]
     end
-
-    $redis.sadd("allholes", player_ids)
-    allholes = $redis.smembers("allholes")
+    $redis.sadd("allholes", JSON.generate(allholes))
 
     PlayerBroadcastJob.perform_later({
-        :type => "GAME_START_EVENT",
-        :payload => { :allholes => allholes }
-      })
+      :type => "GAME_START_EVENT",
+      :payload => { :allholes => allholes }
+    })
   end
 
   # def deal_hole

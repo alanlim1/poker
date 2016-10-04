@@ -1,7 +1,8 @@
 dealHoleEvent = (message) ->
-  hole_html = "";
-  for allholes in message.allholes
-    hole_html += "#{allholes}"
+  hole_html = '';
+  for k,v of message.allholes
+    console.log(k)
+    console.log(v)
   $("#playerHand").html(hole_html)
 
 dealCommonCardsEvent = (message) ->
@@ -9,6 +10,12 @@ dealCommonCardsEvent = (message) ->
   for commoncards in message.commoncards
     cards_html += "#{commoncards}"
   $("#commoncards").html(cards_html)
+
+joinLeaveEvent = (message) ->
+  players_html = "";
+  for player in message.players
+    players_html += "<div id=#{player.id}>#{player.name}</div>"
+  $("#players").html(players_html)
 
 startGame = () ->
   App.player_channel = App.cable.subscriptions.create {
@@ -30,9 +37,10 @@ startGame = () ->
     $(".start-link").show()
 
   received: (message) ->
-    console.log(message)
+    # console.log(message)
     # $('#commoncards').append message['message']
     switch message.type
+      when "JOIN_LEAVE_EVENT" then joinLeaveEvent message.payload
       when "GAME_START_EVENT" then dealHoleEvent message.payload
       when "DEAL_COMMON_CARDS_EVENT" then dealCommonCardsEvent message.payload
 
