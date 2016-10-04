@@ -3,6 +3,7 @@ class TableChannel < ApplicationCable::Channel
     stream_from "table_channel"
     $redis.sadd("players", connection.current_player.id)
     notify_players
+    stream_from "player_channel"
   end
 
   def unsubscribed
@@ -21,7 +22,13 @@ class TableChannel < ApplicationCable::Channel
     end
 
     TableBroadcastJob.perform_later({
-        :type => "JOIN_LEAVE_EVENT",
+        :type => "JOIN_LEAVE_EVENT", 
+        # :type => "pre_betEvent", 
+        # :type => "betEvent", 
+        # :type => "foldEvent", 
+        # :type => "flopEvent", 
+        # :type => "turnEvent", 
+        # :type => "riverEvent",
         :payload => { :players => players }
       })
   end

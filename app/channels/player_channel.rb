@@ -1,7 +1,9 @@
-class WebNotificationsChannel < ApplicationCable::Channel
+class PlayerChannel < ApplicationCable::Channel
   def subscribed
-    stream_from "web_notifications_channel"
+    stream_from "player_channel"
+    deck
     hole
+    commoncards
   end
 
   def unsubscribed
@@ -12,27 +14,41 @@ class WebNotificationsChannel < ApplicationCable::Channel
   private 
 
   def deck
-  end
-
-  def hole
-
     faces = %w[A K Q J T 9 8 7 6 5 4 3 2]
     suits = %w[c d h s]
 
-    deck = []
+    @deck = []
 
     faces.each do |f|
       suits.each do |s|
-        deck.push(f + s)
+        @deck.push(f + s)
       end
     end
 
     3.times do
-      deck.shuffle!
+      @deck.shuffle!
     end
+  end
 
+  def commoncards
+    flop = Array.new(3) { @deck.shift }
+    burn = @deck.shift
+    turn = Array.new(1) { @deck.shift }
+    burn
+    river = Array.new(1) { @deck.shift }
+    
+    $redis.sadd("commoncards", flop+turn+river)
+    commoncards = $redis.smembers("commoncards")
+
+    PlayerBroadcastJob.perform_later({
+        :type => "DEAL_COMMON_CARDS_EVENT",
+        :payload => { :commoncards => flop }
+      })
+  end
+
+  def hole
     player_ids = $redis.smembers("players")
-    hole = Array.new(player_ids.count) { Array.new(2) { deck.shift } }
+    hole = Array.new(player_ids.count) { Array.new(2) { @deck.shift } }
 
     # player_ids.each_with_index do |element, index|
     #   $redis.sadd("holey", {player_ids[index] => hole[index]}) 
@@ -55,23 +71,12 @@ class WebNotificationsChannel < ApplicationCable::Channel
     $redis.sadd("allholes", player_ids)
     allholes = $redis.smembers("allholes")
 
-    flop = Array.new(3) { deck.shift }
-    burn = deck.shift
-    turn = Array.new(1) { deck.shift }
-    burn
-    river = Array.new(1) { deck.shift }
-    
-    $redis.sadd("commoncards", flop+turn+river)
-    commoncards = $redis.smembers("commoncards")
-
-    $redis.sadd("god", flop+turn+river + player_ids)
-    god = $redis.smembers("god")
-
-    WebNotificationsBroadcastJob.perform_later({
+    PlayerBroadcastJob.perform_later({
         :type => "GAME_START_EVENT",
-        :payload => { :playerHand => allholes, :commoncards => flop + turn + river }
+        :payload => { :allholes => allholes }
       })
   end
+
   # def deal_hole
   #   player_ids = $redis.smembers("players")
   #   hole = []
