@@ -1,8 +1,15 @@
-dealHoleEvent = (message) ->
-  hole_html = "";
-  for card in message.hole
-    hole_html += "<div>#{card}</div>"
-  $("#playerHand").html(hole_html)
+dealHoleEvent = (payload) ->
+  hole_html = ""
+  for card in payload.hole
+    hole_html += "<div class=\"card card-#{card}\"></div>"
+  $("#player-hand").html(hole_html)
+
+doBet = (payload) =>
+  $("#player_actions").show()
+  $("#messages").append(payload.message)
+
+hideActions = () =>
+  $("#player_actions").hide()
 
 joinUserChannel = () ->
   App.player_channel = App.cable.subscriptions.create {
@@ -20,11 +27,13 @@ joinUserChannel = () ->
     # $('#commoncards').append message['message']
     switch message.type
       when "HOLE_EVENT" then dealHoleEvent message.payload
+      when "BET_EVENT" then doBet message.payload
 
 leaveUserChannel = () ->
-  console.log(App.web_notifications_channel)
+  console.log(App.player_channel)
   App.cable.subscriptions.remove(App.player_channel)
 
 $(document).on 'turbolinks:load', () ->
   $('.join-link').on 'ajax:beforeSend', joinUserChannel
+  $('.raise-button').on 'ajax:success', hideActions
   $('.leave-game-link').on 'click', leaveUserChannel

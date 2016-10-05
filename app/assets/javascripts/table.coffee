@@ -4,7 +4,7 @@ joinLeaveEvent = (message) ->
     players_html += "<div id=#{player.id}>#{player.name}</div>"
   $("#players").html(players_html)
 
-  if message.players.length > 1
+  if message.players.length > 2 #TODO: make this check at the server
     $('#start').show()
   else
     $('#start').hide()
@@ -37,10 +37,6 @@ riverReveal = (message) ->
   $('.river').html(river_html)
 
 betEvent = (message) ->
-  bet_html = "";
-  for bet in message
-    bet_html += "#{bet}"
-  $('.bet').html(bet_html)
 
 joinTable = () ->
   App.table_channel = App.cable.subscriptions.create {

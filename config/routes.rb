@@ -10,9 +10,10 @@ Rails.application.routes.draw do
   get :start, to: "table#start"
   get :call, to: "player_actions#call"
   get :check, to: "player_actions#check"
-  get :raise, to: "player_actions#raise"
+  post :raise, to: "player_actions#raise"
   get :fold, to: "player_actions#raise"
-  
+  get :flush_redis, to: "home#flush_redis"
+
   devise_for :players,
     controllers: {
       sessions: 'devise/sessions'
