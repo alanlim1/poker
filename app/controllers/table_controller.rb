@@ -25,65 +25,76 @@ class TableController < ApplicationController
     if $redis.get("state") == "STARTED"
       player_turn
       pre_bet #commoncards given but not revealed
-      $redis.set("state", "BET")
-    end
-
-    if $redis.get("state") == "BET"
-      bet
       $redis.set("state", "FLOP")
     end
 
     if $redis.get("state") == "FLOP"
+      TableBroadcastJob.perform_later({
+          :type => "FLOP_REVEAL_EVENT",
+          :payload => { :flop => @flop }
+        })
+      #reveal flop, update pot
       bet
       $redis.set("state", "TURN")
     end
 
     if $redis.get("state") == "TURN"
+      TableBroadcastJob.perform_later({
+          :type => "TURN_REVEAL_EVENT",
+          :payload => { :turn => @turn }
+        })
       bet
       $redis.set("state", "RIVER")
     end
 
     if $redis.get("state") == "RIVER"
+      TableBroadcastJob.perform_later({
+          :type => "RIVER_REVEAL_EVENT",
+          :payload => { :river => @river }
+        })
       bet
+      $redis.set("state", "COMPARE_HANDS")
+    end
+
+    if $redis.get("state") == "COMPARE_HANDS"
+      # game_ended #gem to compare HANDS
+      #declare winner, % probability, etc
+      #give out pot to winner / split
       $redis.set("state", "ENDED")
     end
 
     if $redis.get("state") == "ENDED"
-      # game_ended
-      $redis.set("state", "FIN")
+      # $redis.del("state")
+      # $redis.flushall
     end
 
 
   end
 
   def player_turn
-    players = $redis.smembers "players"
-
+    players = $redis.smembers("players")
     dealer = $redis.get("dealer_index").to_i
     small_blind = dealer + 1 >= players.length ? 0 : dealer + 1 #if true 0, else false (dealer+1)
     big_blind = small_blind + 1 >= players.length ? 0 : small_blind + 1
     player_order = [players[dealer], players[small_blind], players[big_blind]]
     player_order = (players - player_order) + player_order
-
     $redis.sadd("player_order", player_order)
   end
 
   def pre_bet
-    player_order = $redis.smembers "player_order"
+    player_order = $redis.smembers("player_order")
+    #WHAT IF SOMEONE RAISES THE BET?
     player_order.each do 
-      if player_action == "call", "raise", "fold"
-        
+      # if player_action == "call" || "raise" || "fold"
+        #do the action and go next, if bet is raised>!>!> then WHAT!!!?!?!??!?!
+      # end
+    end
+
     # dealer_index = $redis.get "dealer_index"
     # small_blind = dealer_index + 1 , if small_blind is bigger than array length, reset to 0
     # big_blind = small_blind + 1
     # starting_player = big_blind + 1
     # [starting_player, ]
-    players.each do
-
-    end
-
-      
-    end
   end
 
   def bet
@@ -117,7 +128,7 @@ class TableController < ApplicationController
       @deck.shuffle!
     end
 
-    $redis.sadd "deck", @deck
+    $redis.sadd("deck", @deck)
     @redisdeck = $redis.smembers("deck").shuffle!
 
     3.times do
