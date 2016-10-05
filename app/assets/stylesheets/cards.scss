@@ -1,3 +1,18 @@
-// Place all the styles related to the cards controller here.
-// They will automatically be included in application.css.
-// You can use Sass (SCSS) here: http://sass-lang.com/
+.poker_cards {
+
+  .2c {
+    background-image: asset-url("2c.png");
+  }
+
+  .2d {
+    background-image: asset-url("2d.png");
+  }
+
+  .2h {
+    background-image: asset-url("2h.png");
+  }
+
+  .2s {
+    background-image: asset-url("2h.png");
+  }
+}

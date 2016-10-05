@@ -82,26 +82,26 @@ class TableController < ApplicationController
   end
 
   def pre_bet
-    player_order = $redis.smembers("player_order")
-    #WHAT IF SOMEONE RAISES THE BET?
-    player_order.each do 
-      # if player_action == "call" || "raise" || "fold"
-        #do the action and go next, if bet is raised>!>!> then WHAT!!!?!?!??!?!
-      # end
-    end
+     player_order = $redis.smembers("player_order")
+     #WHAT IF SOMEONE RAISES THE BET?
+     player_order.each do
+       # if player_action == "call" || "raise" || "fold"
+         #do the action and go next, if bet is raised>!>!> then WHAT!!!?!?!??!?!
+       # end
+     end
 
-    # dealer_index = $redis.get "dealer_index"
-    # small_blind = dealer_index + 1 , if small_blind is bigger than array length, reset to 0
-    # big_blind = small_blind + 1
-    # starting_player = big_blind + 1
-    # [starting_player, ]
-  end
+     # dealer_index = $redis.get "dealer_index"
+     # small_blind = dealer_index + 1 , if small_blind is bigger than array length, reset to 0
+     # big_blind = small_blind + 1
+     # starting_player = big_blind + 1
+     # [starting_player, ]
+   end
 
   def bet
   end
 
   def fold
-    # if $redis.get("state") == "STARTED" || "BET" || "FLOP" || "TURN" || "RIVER" 
+    # if $redis.get("state") == "STARTED" || "BET" || "FLOP" || "TURN" || "RIVER"
     #   && $redis.get("player_turn") == true
     # end
   end
