@@ -24,7 +24,7 @@ class TableController < ApplicationController
 
     if $redis.get("state") == "STARTED"
       player_turn
-      pre_bet #commoncards given but not revealed
+      bet #commoncards given but not revealed
       $redis.set("state", "FLOP")
     end
 
@@ -65,10 +65,8 @@ class TableController < ApplicationController
 
     if $redis.get("state") == "ENDED"
       # $redis.del("state")
-      # $redis.flushall
+      $redis.flushall
     end
-
-
   end
 
   def player_turn
@@ -78,32 +76,32 @@ class TableController < ApplicationController
     big_blind = small_blind + 1 >= players.length ? 0 : small_blind + 1
     player_order = [players[dealer], players[small_blind], players[big_blind]]
     player_order = (players - player_order) + player_order
-    $redis.sadd("player_order", player_order)
-  end
-
-  def pre_bet
-     player_order = $redis.smembers("player_order")
-     #WHAT IF SOMEONE RAISES THE BET?
-     player_order.each do
-       # if player_action == "call" || "raise" || "fold"
-         #do the action and go next, if bet is raised>!>!> then WHAT!!!?!?!??!?!
-       # end
-     end
-
-     # dealer_index = $redis.get "dealer_index"
-     # small_blind = dealer_index + 1 , if small_blind is bigger than array length, reset to 0
-     # big_blind = small_blind + 1
-     # starting_player = big_blind + 1
-     # [starting_player, ]
-   end
-
-  def bet
+    $redis.set("player_order", player_order)
   end
 
   def fold
     # if $redis.get("state") == "STARTED" || "BET" || "FLOP" || "TURN" || "RIVER"
     #   && $redis.get("player_turn") == true
     # end
+  end
+
+  def bet
+    player_order = $redis.smembers("player_order")
+    TableBroadcastJob.perform_later({
+        :type => "BET_EVENT",
+        :payload => "Betting started"
+      })
+
+    #WHAT IF SOMEONE RAISES THE BET?
+      # if player_action == "call" || "raise" || "fold"
+        #do the action and go next, if bet is raised>!>!> then WHAT!!!?!?!??!?!
+      # end
+
+    # dealer_index = $redis.get "dealer_index"
+    # small_blind = dealer_index + 1 , if small_blind is bigger than array length, reset to 0
+    # big_blind = small_blind + 1
+    # starting_player = big_blind + 1
+    # [starting_player, ]
   end
 
   def game_ended

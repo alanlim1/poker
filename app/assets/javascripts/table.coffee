@@ -36,6 +36,12 @@ riverReveal = (message) ->
     river_html += "#{river}"
   $('.river').html(river_html)
 
+betEvent = (message) ->
+  bet_html = "";
+  for bet in message
+    bet_html += "#{bet}"
+  $('.bet').html(bet_html)
+
 joinTable = () ->
   App.table_channel = App.cable.subscriptions.create {
       channel: "TableChannel"
@@ -59,12 +65,7 @@ joinTable = () ->
       when "FLOP_REVEAL_EVENT" then flopReveal message.payload
       when "TURN_REVEAL_EVENT" then turnReveal message.payload
       when "RIVER_REVEAL_EVENT" then riverReveal message.payload
-      # when "pre_bet" then pre_betEvent message.payload
-      # when "bet" then betEvent message.payload
-      # when "fold" then foldEvent message.payload
-      # when "flop" then flopEvent message.payload
-      # when "turn" then turnEvent message.payload
-      # when "river" then riverEvent message.payload
+      when "BET_EVENT" then betEvent message.payload
 
 leaveTable = () ->
   console.log(App.table_channel)

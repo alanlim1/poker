@@ -8,15 +8,15 @@ Rails.application.routes.draw do
   get :join, to: "table#join"
   get :leave, to: "table#leave"
   get :start, to: "table#start"
-
+  get :call, to: "player_actions#call"
+  get :check, to: "player_actions#check"
+  get :raise, to: "player_actions#raise"
+  get :fold, to: "player_actions#raise"
+  
   devise_for :players,
     controllers: {
       sessions: 'devise/sessions'
     }
-
-  resource :cards, only: [:show] do
-    patch :add, to: "cards#add"
-  end
 
   resources :transactions, only: [:new, :create] do
   end
