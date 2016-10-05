@@ -80,7 +80,7 @@ class TableController < ApplicationController
   end
 
   def bet
-    player_order = $redis.smembers("player_order")
+    player_order = $redis.get("player_order")
     TableBroadcastJob.perform_later({
         :type => "BET_EVENT",
         :payload => "Betting started"
