@@ -37,3 +37,6 @@ $(document).on 'turbolinks:load', () ->
   $('.join-link').on 'ajax:beforeSend', joinUserChannel
   $('.raise').on 'ajax:success', hideActions
   $('.leave-game-link').on 'click', leaveUserChannel
+  $('.fold-link').on 'ajax:success', hideActions
+  $('.call-link').on 'ajax:success', hideActions
+  $('.check-link').on 'ajax:success', hideActions

@@ -57,6 +57,11 @@ class PlayerActionsController < ApplicationController
       pot = $redis.get("pot").to_i
       $redis.set("pot", pot + bet)
       next_bet
+
+      TableBroadcastJob.perform_later({
+        :type => "BET_EVENT",
+        :payload => {:message => "#{current_player.id} has raised $#{bet}! "}
+        })
     end
   end
 
@@ -71,11 +76,29 @@ class PlayerActionsController < ApplicationController
 
       TableBroadcastJob.perform_later({
         :type => "BET_EVENT",
-        :payload => {:message => "#{current_player.id} has folded"}
+        :payload => {:message => "#{current_player.id} has folded. "}
         })
 
     end
     next_bet_if_fold
+  end
+
+  def next_bet
+    @nu_player_order.rotate!
+    $redis.set("nu_player_order", @nu_player_order)
+
+    next_player_id = @nu_player_order[0].to_i
+    current_bet = $redis.get("previous_bet").to_i
+
+    PlayerBroadcastJob.perform_later(next_player_id, {
+      :type => "BET_EVENT",
+      :payload => {:current_bet => current_bet}
+      })
+
+    TableBroadcastJob.perform_later({
+        :type => "BET_EVENT",
+        :payload => {:current_player => next_player_id }
+        })
   end
 
   def next_bet_if_fold
@@ -106,32 +129,32 @@ class PlayerActionsController < ApplicationController
     current_player.id == @nu_player_order[0].to_i
   end
 
-  def next_bet
-    @nu_player_order.rotate!
-    # player_order.each do |x|
-    #   @new_order = [] << x.to_i
-    # end
-    # $redis.del("player_order")
-    # $redis.set("player_order", @new_order)
-    $redis.set("nu_player_order", @nu_player_order)
+  # def OLD_next_bet ## LEGACY CODES
+  #   @nu_player_order.rotate!
+  #   # player_order.each do |x|
+  #   #   @new_order = [] << x.to_i
+  #   # end
+  #   # $redis.del("player_order")
+  #   # $redis.set("player_order", @new_order)
+  #   $redis.set("nu_player_order", @nu_player_order)
 
-    next_player_id = @nu_player_order[0].to_i
+  #   next_player_id = @nu_player_order[0].to_i
 
-    # $redis.set("pot", @pot + params[:bet].to_i)
-    # players = eval(@player_order)
-    # next_player = players[players.index(current_player.id) + 1] # if you're the last player don't add one
-    # round_2 = [] << current_player.id
-    # $redis.set("round_2", round_2)
-    # RevealActionBroadcast.perform_later(next_player)
+  #   # $redis.set("pot", @pot + params[:bet].to_i)
+  #   # players = eval(@player_order)
+  #   # next_player = players[players.index(current_player.id) + 1] # if you're the last player don't add one
+  #   # round_2 = [] << current_player.id
+  #   # $redis.set("round_2", round_2)
+  #   # RevealActionBroadcast.perform_later(next_player)
 
-    current_bet = $redis.get("previous_bet").to_i
-    PlayerBroadcastJob.perform_later(next_player_id, {
-      :type => "BET_EVENT",
-      :payload => {:current_bet => current_bet}
-      })
-    # TableBroadcastJob.perform_later({
-    #     :type => "BET_EVENT",
-    #     :payload => {:current_player => next_player_id }
-    #     })
-  end
+  #   current_bet = $redis.get("previous_bet").to_i
+  #   PlayerBroadcastJob.perform_later(next_player_id, {
+  #     :type => "BET_EVENT",
+  #     :payload => {:current_bet => current_bet}
+  #     })
+  #   # TableBroadcastJob.perform_later({
+  #   #     :type => "BET_EVENT",
+  #   #     :payload => {:current_player => next_player_id }
+  #   #     })
+  # end
 end

@@ -102,10 +102,18 @@ class TableController < ApplicationController
   def bet
     player_order = $redis.smembers("player_order")
     next_player_id = player_order[0]
+
+    TableBroadcastJob.perform_later({
+        :type => "BET_EVENT",
+        :payload => {
+          :message => "Betting has started. You are next in line. "
+        }
+      })
+
     PlayerBroadcastJob.perform_later(next_player_id, {
         :type => "BET_EVENT",
         :payload => {
-          :message => "Betting started"
+          :message => "Place your bets, please. "
         }
       })
       # TableBroadcastJob.perform_later({
