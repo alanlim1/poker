@@ -40,15 +40,15 @@ class PlayerActionsController < ApplicationController
   end
 
   def isAllowedToBet
-    if @nu_player_order == nil
-      player_order = $redis.smembers("player_order")
-      @nu_player_order ||= player_order
-    else
-      @nu_player_order
-    end
     player_order = $redis.smembers("player_order")
+
+    if !$redis.get("nu_player_order")
+      $redis.set("nu_player_order", player_order)
+    end
+
+    @nu_player_order = eval($redis.get("nu_player_order"))
+
     current_player.id == player_order[0].to_i || @nu_player_order[0].to_i
-    binding.pry
   end
 
   def next_bet
@@ -58,8 +58,10 @@ class PlayerActionsController < ApplicationController
     # end
     # $redis.del("player_order")
     # $redis.set("player_order", @new_order)
+    $redis.set("nu_player_order", @nu_player_order)
 
-    next_player_id = @nu_player_order[0]
+    next_player_id = @nu_player_order[0].to_i
+    binding.pry
     # $redis.set("pot", @pot + params[:bet].to_i)
     # players = eval(@player_order)
     # next_player = players[players.index(current_player.id) + 1] # if you're the last player don't add one
