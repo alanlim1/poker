@@ -62,8 +62,8 @@ class PlayerActionsController < ApplicationController
 
   def fold
     if isAllowedToBet
-      x = @nu_player_order.delete("#{current_player.id}".to_s)
-      $redis.set("nu_player_order", x)
+      @nu_player_order.delete("#{current_player.id}".to_s)
+      $redis.set("nu_player_order", @nu_player_order)
 
       $redis.srem("player_order", current_player.id)
       # player_order = $redis.smembers("player_order")
@@ -75,7 +75,23 @@ class PlayerActionsController < ApplicationController
         })
 
     end
-    next_bet
+    next_bet_if_fold
+  end
+
+  def next_bet_if_fold
+    next_player_id = @nu_player_order[0].to_i
+
+    current_bet = $redis.get("previous_bet").to_i
+
+    PlayerBroadcastJob.perform_later(next_player_id, {
+      :type => "BET_EVENT",
+      :payload => {:current_bet => current_bet}
+      })
+
+    TableBroadcastJob.perform_later({
+        :type => "BET_EVENT",
+        :payload => {:current_player => next_player_id }
+        })
   end
 
   def isAllowedToBet
