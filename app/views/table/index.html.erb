@@ -28,7 +28,7 @@
     <div><%= link_to "Call", call_bet_path, remote: true, class: 'call-link' %></div>
     <div><%= link_to "Fold", fold_path, remote: true, class: 'fold-link' %></div>
     <div class="raise">
-      <%= form_tag raise_path, remote: true do %>
+      <%= form_tag raise_bet_path, remote: true do %>
         <%= number_field_tag 'bet' %>
         <%= submit_tag "Raise", class: "raise-button" %>
       <% end %>

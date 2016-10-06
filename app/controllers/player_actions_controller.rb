@@ -33,7 +33,7 @@ class PlayerActionsController < ApplicationController
     next_bet
   end
 
-  def raise
+  def raise_bet
     if isAllowedToBet
       # player_order = $redis.smembers("player_order")
       previous_bet = $redis.get("previous_bet")? $redis.get("previous_bet").to_i : nil
@@ -62,8 +62,8 @@ class PlayerActionsController < ApplicationController
 
   def fold
     if isAllowedToBet
-      @nu_player_order.delete("#{current_player.id}")
-      $redis.set("nu_player_order", @nu_player_order)
+      x = @nu_player_order.delete("#{current_player.id}".to_s)
+      $redis.set("nu_player_order", x)
 
       $redis.srem("player_order", current_player.id)
       # player_order = $redis.smembers("player_order")
@@ -81,13 +81,13 @@ class PlayerActionsController < ApplicationController
   def isAllowedToBet
     player_order = $redis.smembers("player_order")
 
-    if !$redis.get("nu_player_order")
+    if $redis.get("nu_player_order").nil?
       $redis.set("nu_player_order", player_order)
+    # else
+    #   @nu_player_order = eval($redis.get("nu_player_order"))
     end
-
     @nu_player_order = eval($redis.get("nu_player_order"))
-
-    current_player.id == player_order[0].to_i || @nu_player_order[0].to_i
+    current_player.id == @nu_player_order[0].to_i
   end
 
   def next_bet

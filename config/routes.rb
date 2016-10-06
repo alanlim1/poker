@@ -10,7 +10,7 @@ Rails.application.routes.draw do
   get :start, to: "table#start"
   get :call_bet, to: "player_actions#call_bet"
   get :check, to: "player_actions#check"
-  post :raise, to: "player_actions#raise"
+  post :raise_bet, to: "player_actions#raise_bet"
   get :fold, to: "player_actions#raise"
   get :flush_redis, to: "home#flush_redis"
 
