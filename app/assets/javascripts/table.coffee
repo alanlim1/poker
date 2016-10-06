@@ -21,19 +21,23 @@ gameStarted = (message) ->
 flopReveal = (message) ->
   flop_html = "";
   for flop in message.flop
-    flop_html += "#{flop}"
+
+    flop_html += "<div class=\"flop card-#{flop} col-sm-4\"></div>"
+
   $('.flop').html(flop_html)
 
 turnReveal = (message) ->
   turn_html = "";
   for turn in message.turn
-    turn_html += "#{turn}"
+
+    turn_html += "<div class=\"turn card-#{turn} col-sm-6 turn_style\"></div>"
+
   $('.turn').html(turn_html)
 
 riverReveal = (message) ->
   river_html = "";
   for river in message.river
-    river_html += "#{river}"
+    river_html += "<div class=\"river card-#{river} col-sm-6\"></div>"
   $('.river').html(river_html)
 
 betEvent = (message) ->

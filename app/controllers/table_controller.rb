@@ -28,48 +28,48 @@ class TableController < ApplicationController
       player_turn
       set_pot
       bet #commoncards given but not revealed
-      # $redis.set("state", "FLOP")
+      $redis.set("state", "FLOP")
     end
 
-    # if $redis.get("state") == "FLOP"
-    #   TableBroadcastJob.perform_later({
-    #       :type => "FLOP_REVEAL_EVENT",
-    #       :payload => { :flop => @flop }
-    #     })
-    #   #reveal flop, update pot
-    #   bet
-    #   $redis.set("state", "TURN")
-    # end
-    #
-    # if $redis.get("state") == "TURN"
-    #   TableBroadcastJob.perform_later({
-    #       :type => "TURN_REVEAL_EVENT",
-    #       :payload => { :turn => @turn }
-    #     })
-    #   bet
-    #   $redis.set("state", "RIVER")
-    # end
-    #
-    # if $redis.get("state") == "RIVER"
-    #   TableBroadcastJob.perform_later({
-    #       :type => "RIVER_REVEAL_EVENT",
-    #       :payload => { :river => @river }
-    #     })
-    #   bet
-    #   $redis.set("state", "COMPARE_HANDS")
-    # end
-    #
-    # if $redis.get("state") == "COMPARE_HANDS"
-    #   # game_ended #gem to compare HANDS
-    #   #declare winner, % probability, etc
-    #   #give out pot to winner / split
-    #   $redis.set("state", "ENDED")
-    # end
-    #
-    # if $redis.get("state") == "ENDED"
-    #   # $redis.del("state")
-    #   # $redis.flushall
-    # end
+    if $redis.get("state") == "FLOP"
+      TableBroadcastJob.perform_later({
+          :type => "FLOP_REVEAL_EVENT",
+          :payload => { :flop => @flop }
+        })
+      #reveal flop, update pot
+      bet
+      $redis.set("state", "TURN")
+    end
+
+    if $redis.get("state") == "TURN"
+      TableBroadcastJob.perform_later({
+          :type => "TURN_REVEAL_EVENT",
+          :payload => { :turn => @turn }
+        })
+      bet
+      $redis.set("state", "RIVER")
+    end
+
+    if $redis.get("state") == "RIVER"
+      TableBroadcastJob.perform_later({
+          :type => "RIVER_REVEAL_EVENT",
+          :payload => { :river => @river }
+        })
+      bet
+      $redis.set("state", "COMPARE_HANDS")
+    end
+
+    if $redis.get("state") == "COMPARE_HANDS"
+      # game_ended #gem to compare HANDS
+      #declare winner, % probability, etc
+      #give out pot to winner / split
+      $redis.set("state", "ENDED")
+    end
+
+    if $redis.get("state") == "ENDED"
+      # $redis.del("state")
+      # $redis.flushall
+    end
   end
 
   def player_turn

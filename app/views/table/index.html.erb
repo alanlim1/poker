@@ -1,45 +1,50 @@
-<% if current_player %>
+<div class="table_background">
 
-<div id="not-joined">
-  <%= link_to "Join", join_path, remote: true, class: 'join-link' %>
+  <% if current_player %>
+
+  <div id="not-joined">
+    <%= link_to "Join", join_path, remote: true, class: 'join-link' %>
+  </div>
+  <div id="joined">
+    <a href="#" class="leave-link">Leave</a>
+    <span id="start" display="none">
+      <%= link_to "Start", start_path, remote: true, class: 'start-link' %>
+    </span>
+
+
+    <div id="players">
+    </div>
+
+    <div id="player-hand">
+    </div>
+
+    <div id="commoncards row">
+      <div class="flop col-md-7"></div>
+      <div class="turnriver col-md-5">
+        <div class="turn"></div>
+        <div class="river"></div>
+      </div>
+    </div>
+
+    <div id="player_actions" style="display: none;">
+      <div class="player_actions_child">
+      <div><%= link_to "Check", check_path, remote: true, class: 'check-link' %></div>
+      <div><%= link_to "Call", call_path, remote: true, class: 'call-link' %></div>
+      <div><%= link_to "Fold", fold_path, remote: true, class: 'fold-link' %></div>
+      <div>
+      <%= form_tag raise_path, remote: true do %>
+        <%= number_field_tag 'bet' %>
+        <%= submit_tag "Raise", id: "raise-button" %></div>
+      <% end %>
+    </div>
+
+      <div class="bet"></div>
+    </div>
+    <div id="messages">
+    </div>
+
+  </div>
+
+  <% end %>
+
 </div>
-<div id="joined">
-  <a href="#" class="leave-link">Leave</a>
-  <span id="start" display="none">
-    <%= link_to "Start", start_path, remote: true, class: 'start-link' %>
-  </span>
-
-
-  <div id="players">
-  </div>
-
-  <div id="player-hand">
-  </div>
-
-  <div id="commoncards">
-    <div class="flop"></div>
-
-    <div class="turn"></div>
-    <div class="river"></div>
-  </div>
-
-  <div id="player_actions" style="display: none;">
-    <div class="player_actions_child">
-    <div><%= link_to "Check", check_path, remote: true, class: 'check-link' %></div>
-    <div><%= link_to "Call", call_path, remote: true, class: 'call-link' %></div>
-    <div><%= link_to "Fold", fold_path, remote: true, class: 'fold-link' %></div>
-    <div>
-    <%= form_tag raise_path, remote: true do %>
-      <%= number_field_tag 'bet' %>
-      <%= submit_tag "Raise", id: "raise-button" %></div>
-    <% end %>
-  </div>
-
-    <div class="bet"></div>
-  </div>
-  <div id="messages">
-  </div>
-
-</div>
-
-<% end %>

@@ -1,6 +1,14 @@
 #player-hand {
   display: flex;
+  padding-bottom: 20px;
+  margin-left: 15px;
 }
+
+.table_background {
+  background-color: green;
+}
+
+
 
 .card {
   flex: 1 0 auto;
@@ -241,4 +249,8 @@
 .card-Ks {
   @extend .cards;
   background: url("poker_cards/Ks.png") no-repeat;
+}
+
+.turn_style {
+  background-position: 70% 50%;
 }
