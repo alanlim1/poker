@@ -5,7 +5,7 @@ dealHoleEvent = (payload) ->
   $("#player-hand").html(hole_html)
 
 doBet = (payload) =>
-  $("#player_actions").show()
+  $(".player_actions_child").show()
   $("#messages").append(payload.message)
 
 hideActions = () =>
@@ -35,5 +35,5 @@ leaveUserChannel = () ->
 
 $(document).on 'turbolinks:load', () ->
   $('.join-link').on 'ajax:beforeSend', joinUserChannel
-  $('.raise-button').on 'ajax:success', hideActions
+  $('.raise').on 'ajax:success', hideActions
   $('.leave-game-link').on 'click', leaveUserChannel

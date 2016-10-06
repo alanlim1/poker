@@ -10,7 +10,7 @@ class TableController < ApplicationController
   end
 
   def start
-    if(!$redis.get("state")) || $redis.get("state") == "FIN"
+    if(!$redis.get("state"))
       deck
       hole
       commoncards
@@ -80,14 +80,24 @@ class TableController < ApplicationController
     key_players = [players[dealer], players[small_blind], players[big_blind]]
     player_order = (players - key_players) + key_players
 
-    $redis.del("player_order")
+    # $redis.del("player_order") <------ #WHY WTF IS THIS FOR?
     $redis.sadd("player_order", player_order)
   end
 
-  def fold
-    # if $redis.get("state") == "STARTED" || "BET" || "FLOP" || "TURN" || "RIVER"
-    #   && $redis.get("player_turn") == true
-    # end
+  def set_pot
+    blind = $redis.get("blind").to_i
+    player_order = $redis.smembers("player_order")
+    small_blind = Player.find(player_order[-2])
+    big_blind = Player.find(player_order[-1])
+
+    small_blind.account -= blind/2
+    big_blind.account -= blind
+
+    small_blind.save
+    big_blind.save
+
+    $redis.set("pot", blind/2 + blind)
+
   end
 
   def bet
@@ -145,16 +155,6 @@ class TableController < ApplicationController
     end
   end
 
-  def commoncards
-    @flop = Array.new(3) { @redisdeck.shift }
-    burn = @redisdeck.shift
-    @turn = Array.new(1) { @redisdeck.shift }
-    burn = @redisdeck.shift
-    @river = Array.new(1) { @redisdeck.shift }
-
-    $redis.sadd "commoncards", @flop+@turn+@river
-  end
-
   def hole
     player_ids = $redis.smembers("players")
     hole = Array.new(player_ids.count) { Array.new(2) { @redisdeck.shift } }
@@ -173,19 +173,15 @@ class TableController < ApplicationController
     end
   end
 
-  def set_pot
-    blind = $redis.get("blind").to_i
-    player_order = $redis.smembers("player_order")
-    small_blind = Player.find(player_order[-2])
-    big_blind = Player.find(player_order[-1])
+  def commoncards
+    @flop = Array.new(3) { @redisdeck.shift }
+    burn = @redisdeck.shift
+    @turn = Array.new(1) { @redisdeck.shift }
+    burn = @redisdeck.shift
+    @river = Array.new(1) { @redisdeck.shift }
 
-    small_blind.account -= blind/2
-    big_blind.account -= blind
-
-    small_blind.save
-    big_blind.save
-
-    $redis.set("pot", blind/2 + blind)
-
+    $redis.sadd("commoncards", @flop+@turn+@river)
   end
+
+  
 end

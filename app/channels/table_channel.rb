@@ -26,12 +26,6 @@ class TableChannel < ApplicationCable::Channel
 
     TableBroadcastJob.perform_later({
         :type => "JOIN_LEAVE_EVENT",
-        # :type => "pre_betEvent",
-        # :type => "betEvent",
-        # :type => "foldEvent",
-        # :type => "flopEvent",
-        # :type => "turnEvent",
-        # :type => "riverEvent",
         :payload => { :players => players }
       })
   end

@@ -50,6 +50,7 @@ ActiveRecord::Schema.define(version: 20161005125159) do
     t.datetime "updated_at",                                                     null: false
     t.string   "cards"
     t.string   "hole"
+    t.         "holearray"
     t.decimal  "account",                precision: 8, scale: 2, default: "0.0"
     t.index ["email"], name: "index_players_on_email", unique: true
     t.index ["reset_password_token"], name: "index_players_on_reset_password_token", unique: true
