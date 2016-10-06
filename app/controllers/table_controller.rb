@@ -106,6 +106,7 @@ class TableController < ApplicationController
     TableBroadcastJob.perform_later({
         :type => "BET_EVENT",
         :payload => {
+          :current_player => next_player_id,
           :message => "Betting has started. You are next in line. "
         }
       })
@@ -116,20 +117,10 @@ class TableController < ApplicationController
           :message => "Place your bets, please. "
         }
       })
-      # TableBroadcastJob.perform_later({
-      #     :type => "BET_EVENT",
-      #     :payload => {:current_player => next_player_id}
-      #     })
     #WHAT IF SOMEONE RAISES THE BET?
       # if player_action == "call" || "raise" || "fold"
         #do the action and go next, if bet is raised>!>!> then WHAT!!!?!?!??!?!
       # end
-
-    # dealer_index = $redis.get "dealer_index"
-    # small_blind = dealer_index + 1 , if small_blind is bigger than array length, reset to 0
-    # big_blind = small_blind + 1
-    # starting_player = big_blind + 1
-    # [starting_player, ]
   end
 
   def game_ended

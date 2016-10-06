@@ -14,10 +14,15 @@ class PlayerActionsController < ApplicationController
       $redis.set("pot", pot + bet)
 
       next_bet
+
+      TableBroadcastJob.perform_later({
+        :type => "BET_EVENT",
+        :payload => {:message => "#{current_player.id} has called the bet of $#{bet}. "}
+        })
     end
   end
 
-  def check
+  def check #TODO WHAT HAPPENS IS RAISE RERAISE?!
     if isAllowedToBet
       pot = $redis.get("pot")
       player_order = $redis.smembers("player_order")
@@ -62,6 +67,14 @@ class PlayerActionsController < ApplicationController
         :type => "BET_EVENT",
         :payload => {:message => "#{current_player.id} has raised $#{bet}! "}
         })
+
+      player_order = $redis.smembers("player_order")
+      if bet > previous_bet && (current_player.id != player_order[0] || player_order[0].to_i)
+        TableBroadcastJob.perform_later({
+          :type => "RERAISE_EVENT",
+          :payload => {:message => "#{current_player.id} has re-raised $#{bet}! "}
+          })
+      end
     end
   end
 

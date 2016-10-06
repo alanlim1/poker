@@ -8,6 +8,10 @@ doBet = (payload) =>
   $(".player_actions_child").show()
   $("#messages").append(payload.message)
 
+reRaiseEvent = (payload) =>
+  $(".player_actions_child").show()
+  $("#messages").append(payload.message)
+
 hideActions = () =>
   $("#player_actions").hide()
 
@@ -17,7 +21,7 @@ joinUserChannel = () ->
   },
 
   connected: () ->
-    console.log("Joined User Channel!")
+    console.log("Joined Player Channel!")
 
   disconnected: () ->
     console.log("You left the game!")
@@ -28,6 +32,7 @@ joinUserChannel = () ->
     switch message.type
       when "HOLE_EVENT" then dealHoleEvent message.payload
       when "BET_EVENT" then doBet message.payload
+      when "RERAISE_EVENT" then reRaiseEvent message.payload
 
 leaveUserChannel = () ->
   console.log(App.player_channel)
@@ -36,7 +41,7 @@ leaveUserChannel = () ->
 $(document).on 'turbolinks:load', () ->
   $('.join-link').on 'ajax:beforeSend', joinUserChannel
   $('.raise').on 'ajax:success', hideActions
-  $('.leave-game-link').on 'click', leaveUserChannel
   $('.fold-link').on 'ajax:success', hideActions
   $('.call-link').on 'ajax:success', hideActions
   $('.check-link').on 'ajax:success', hideActions
+  # $('.leave-game-link').on 'click', leaveUserChannel
