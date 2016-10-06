@@ -1,9 +1,9 @@
 class TableChannel < ApplicationCable::Channel
   def subscribed
+    #TODO: make sure player has enough in his account
     stream_from "table_channel"
     $redis.sadd("players", connection.current_player.id)
     notify_players
-    stream_from "player_channel"
   end
 
   def unsubscribed
@@ -18,16 +18,19 @@ class TableChannel < ApplicationCable::Channel
     player_ids.each do |player_id|
 
       player = Player.find_by(id: player_id)
+      if !player
+        next
+      end
       players.push({:id => player.id, :name => player.email})
     end
 
     TableBroadcastJob.perform_later({
-        :type => "JOIN_LEAVE_EVENT", 
-        # :type => "pre_betEvent", 
-        # :type => "betEvent", 
-        # :type => "foldEvent", 
-        # :type => "flopEvent", 
-        # :type => "turnEvent", 
+        :type => "JOIN_LEAVE_EVENT",
+        # :type => "pre_betEvent",
+        # :type => "betEvent",
+        # :type => "foldEvent",
+        # :type => "flopEvent",
+        # :type => "turnEvent",
         # :type => "riverEvent",
         :payload => { :players => players }
       })

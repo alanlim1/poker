@@ -1,0 +1,244 @@
+#player-hand {
+  display: flex;
+}
+
+.card {
+  flex: 1 0 auto;
+}
+
+.cards {
+  height: 250px;
+}
+
+.card-Ac {
+  @extend .cards;
+  background: url("poker_cards/Ac.png") no-repeat;
+}
+
+.card-Ad {
+  @extend .cards;
+  background: url("poker_cards/Ad.png") no-repeat;
+}
+.card-Ah {
+  @extend .cards;
+  background: url("poker_cards/Ah.png") no-repeat;
+}
+.card-As {
+  @extend .cards;
+  background: url("poker_cards/As.png") no-repeat;
+}
+
+.card-2c {
+  @extend .cards;
+  background: url("poker_cards/Ac.png") no-repeat;
+}
+
+.card-2d {
+  @extend .cards;
+  background: url("poker_cards/2d.png") no-repeat;
+}
+.card-2h {
+  @extend .cards;
+  background: url("poker_cards/2h.png") no-repeat;
+}
+.card-2s {
+  @extend .cards;
+  background: url("poker_cards/2s.png") no-repeat;
+}
+
+.card-3c {
+  @extend .cards;
+  background: url("poker_cards/3c.png") no-repeat;
+}
+
+.card-3d {
+  @extend .cards;
+  background: url("poker_cards/3d.png") no-repeat;
+}
+.card-3h {
+  @extend .cards;
+  background: url("poker_cards/3h.png") no-repeat;
+}
+.card-3s {
+  @extend .cards;
+  background: url("poker_cards/3s.png") no-repeat;
+}
+
+.card-4c {
+  @extend .cards;
+  background: url("poker_cards/4c.png") no-repeat;
+}
+
+.card-4d {
+  @extend .cards;
+  background: url("poker_cards/4d.png") no-repeat;
+}
+.card-4h {
+  @extend .cards;
+  background: url("poker_cards/4h.png") no-repeat;
+}
+.card-4s {
+  @extend .cards;
+  background: url("poker_cards/4s.png") no-repeat;
+}
+
+.card-5c {
+  @extend .cards;
+  background: url("poker_cards/5c.png") no-repeat;
+}
+
+.card-5d {
+  @extend .cards;
+  background: url("poker_cards/5d.png") no-repeat;
+}
+.card-5h {
+  @extend .cards;
+  background: url("poker_cards/5h.png") no-repeat;
+}
+.card-5s {
+  @extend .cards;
+  background: url("poker_cards/5s.png") no-repeat;
+}
+
+.card-6c {
+  @extend .cards;
+  background: url("poker_cards/6c.png") no-repeat;
+}
+
+.card-6d {
+  @extend .cards;
+  background: url("poker_cards/6d.png") no-repeat;
+}
+.card-6h {
+  @extend .cards;
+  background: url("poker_cards/6h.png") no-repeat;
+}
+.card-6s {
+  @extend .cards;
+  background: url("poker_cards/6s.png") no-repeat;
+}
+
+.card-7c {
+  @extend .cards;
+  background: url("poker_cards/7c.png") no-repeat;
+}
+
+.card-7d {
+  @extend .cards;
+  background: url("poker_cards/7d.png") no-repeat;
+}
+.card-7h {
+  @extend .cards;
+  background: url("poker_cards/7h.png") no-repeat;
+}
+.card-7s {
+  @extend .cards;
+  background: url("poker_cards/7s.png") no-repeat;
+}
+
+.card-8c {
+  @extend .cards;
+  background: url("poker_cards/8c.png") no-repeat;
+}
+
+.card-8d {
+  @extend .cards;
+  background: url("poker_cards/8d.png") no-repeat;
+}
+.card-8h {
+  @extend .cards;
+  background: url("poker_cards/8h.png") no-repeat;
+}
+.card-8s {
+  @extend .cards;
+  background: url("poker_cards/8s.png") no-repeat;
+}
+
+.card-9c {
+  @extend .cards;
+  background: url("poker_cards/9c.png") no-repeat;
+}
+
+.card-9d {
+  @extend .cards;
+  background: url("poker_cards/9d.png") no-repeat;
+}
+.card-9h {
+  @extend .cards;
+  background: url("poker_cards/9h.png") no-repeat;
+}
+.card-9s {
+  @extend .cards;
+  background: url("poker_cards/9s.png") no-repeat;
+}
+
+.card-Tc {
+  @extend .cards;
+  background: url("poker_cards/Tc.png") no-repeat;
+}
+
+.card-Td {
+  @extend .cards;
+  background: url("poker_cards/Td.png") no-repeat;
+}
+.card-Th {
+  @extend .cards;
+  background: url("poker_cards/Th.png") no-repeat;
+}
+.card-Ts {
+  @extend .cards;
+  background: url("poker_cards/Ts.png") no-repeat;
+}
+.card-Jc {
+  @extend .cards;
+  background: url("poker_cards/Tc.png") no-repeat;
+}
+
+.card-Jd {
+  @extend .cards;
+  background: url("poker_cards/Jd.png") no-repeat;
+}
+.card-Jh {
+  @extend .cards;
+  background: url("poker_cards/Jh.png") no-repeat;
+}
+.card-Js {
+  @extend .cards;
+  background: url("poker_cards/Js.png") no-repeat;
+}
+
+.card-Qc {
+  @extend .cards;
+  background: url("poker_cards/Qc.png") no-repeat;
+}
+
+.card-Qd {
+  @extend .cards;
+  background: url("poker_cards/Qd.png") no-repeat;
+}
+.card-Qh {
+  @extend .cards;
+  background: url("poker_cards/Qh.png") no-repeat;
+}
+.card-Qs {
+  @extend .cards;
+  background: url("poker_cards/Qs.png") no-repeat;
+}
+
+.card-Kc {
+  @extend .cards;
+  background: url("poker_cards/Kc.png") no-repeat;
+}
+
+.card-Kd {
+  @extend .cards;
+  background: url("poker_cards/Kd.png") no-repeat;
+}
+.card-Kh {
+  @extend .cards;
+  background: url("poker_cards/Kh.png") no-repeat;
+}
+.card-Ks {
+  @extend .cards;
+  background: url("poker_cards/Ks.png") no-repeat;
+}

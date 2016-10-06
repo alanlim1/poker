@@ -16,6 +16,8 @@ class TableController < ApplicationController
       commoncards
       $redis.set("state", "STARTED")
       $redis.set("dealer_index", "0")
+      $redis.set("pot", "0")
+      $redis.set("blind", "10")
 
       TableBroadcastJob.perform_later({
           :type => "GAME_START_EVENT"
@@ -24,49 +26,50 @@ class TableController < ApplicationController
 
     if $redis.get("state") == "STARTED"
       player_turn
+      set_pot
       bet #commoncards given but not revealed
-      $redis.set("state", "FLOP")
+      # $redis.set("state", "FLOP")
     end
 
-    if $redis.get("state") == "FLOP"
-      TableBroadcastJob.perform_later({
-          :type => "FLOP_REVEAL_EVENT",
-          :payload => { :flop => @flop }
-        })
-      #reveal flop, update pot
-      bet
-      $redis.set("state", "TURN")
-    end
-
-    if $redis.get("state") == "TURN"
-      TableBroadcastJob.perform_later({
-          :type => "TURN_REVEAL_EVENT",
-          :payload => { :turn => @turn }
-        })
-      bet
-      $redis.set("state", "RIVER")
-    end
-
-    if $redis.get("state") == "RIVER"
-      TableBroadcastJob.perform_later({
-          :type => "RIVER_REVEAL_EVENT",
-          :payload => { :river => @river }
-        })
-      bet
-      $redis.set("state", "COMPARE_HANDS")
-    end
-
-    if $redis.get("state") == "COMPARE_HANDS"
-      # game_ended #gem to compare HANDS
-      #declare winner, % probability, etc
-      #give out pot to winner / split
-      $redis.set("state", "ENDED")
-    end
-
-    if $redis.get("state") == "ENDED"
-      # $redis.del("state")
-      $redis.flushall
-    end
+    # if $redis.get("state") == "FLOP"
+    #   TableBroadcastJob.perform_later({
+    #       :type => "FLOP_REVEAL_EVENT",
+    #       :payload => { :flop => @flop }
+    #     })
+    #   #reveal flop, update pot
+    #   bet
+    #   $redis.set("state", "TURN")
+    # end
+    #
+    # if $redis.get("state") == "TURN"
+    #   TableBroadcastJob.perform_later({
+    #       :type => "TURN_REVEAL_EVENT",
+    #       :payload => { :turn => @turn }
+    #     })
+    #   bet
+    #   $redis.set("state", "RIVER")
+    # end
+    #
+    # if $redis.get("state") == "RIVER"
+    #   TableBroadcastJob.perform_later({
+    #       :type => "RIVER_REVEAL_EVENT",
+    #       :payload => { :river => @river }
+    #     })
+    #   bet
+    #   $redis.set("state", "COMPARE_HANDS")
+    # end
+    #
+    # if $redis.get("state") == "COMPARE_HANDS"
+    #   # game_ended #gem to compare HANDS
+    #   #declare winner, % probability, etc
+    #   #give out pot to winner / split
+    #   $redis.set("state", "ENDED")
+    # end
+    #
+    # if $redis.get("state") == "ENDED"
+    #   # $redis.del("state")
+    #   # $redis.flushall
+    # end
   end
 
   def player_turn
@@ -74,18 +77,32 @@ class TableController < ApplicationController
     dealer = $redis.get("dealer_index").to_i
     small_blind = dealer + 1 >= players.length ? 0 : dealer + 1 #if true 0, else false (dealer+1)
     big_blind = small_blind + 1 >= players.length ? 0 : small_blind + 1
-    player_order = [players[dealer], players[small_blind], players[big_blind]]
-    player_order = (players - player_order) + player_order
-    $redis.set("player_order", player_order)
+    key_players = [players[dealer], players[small_blind], players[big_blind]]
+    player_order = (players - key_players) + key_players
+
+    $redis.del("player_order")
+    $redis.sadd("player_order", player_order)
+  end
+
+  def fold
+    # if $redis.get("state") == "STARTED" || "BET" || "FLOP" || "TURN" || "RIVER"
+    #   && $redis.get("player_turn") == true
+    # end
   end
 
   def bet
-    player_order = $redis.get("player_order")
-    TableBroadcastJob.perform_later({
+    player_order = $redis.smembers("player_order")
+    next_player_id = player_order[0]
+    PlayerBroadcastJob.perform_later(next_player_id, {
         :type => "BET_EVENT",
-        :payload => "Betting started"
+        :payload => {
+          :message => "Betting started"
+        }
       })
-
+      # TableBroadcastJob.perform_later({
+      #     :type => "BET_EVENT",
+      #     :payload => {:current_player => next_player_id}
+      #     })
     #WHAT IF SOMEONE RAISES THE BET?
       # if player_action == "call" || "raise" || "fold"
         #do the action and go next, if bet is raised>!>!> then WHAT!!!?!?!??!?!
@@ -156,4 +173,19 @@ class TableController < ApplicationController
     end
   end
 
+  def set_pot
+    blind = $redis.get("blind").to_i
+    player_order = $redis.smembers("player_order")
+    small_blind = Player.find(player_order[-2])
+    big_blind = Player.find(player_order[-1])
+
+    small_blind.account -= blind/2
+    big_blind.account -= blind
+
+    small_blind.save
+    big_blind.save
+
+    $redis.set("pot", blind/2 + blind)
+
+  end
 end
