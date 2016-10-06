@@ -1,11 +1,11 @@
 class PlayerActionsController < ApplicationController
   before_action :authenticate_user!
 
-  def call
+  def call_bet
     if isAllowedToBet
       blind = $redis.get("blind")
-      previous_bet = $redis.get("previous_bet")? $redis.get("previous_bet").to_i : blind
-      bet = previous_bet
+      previous_bet = $redis.get("previous_bet")? $redis.get("previous_bet"): blind
+      bet = previous_bet.to_i
       $redis.set("previous_bet", bet)
       current_player.account -= bet
       current_player.save
@@ -15,20 +15,19 @@ class PlayerActionsController < ApplicationController
 
       next_bet
     end
-
   end
 
   def check
-    binding.pry
     if isAllowedToBet
       pot = $redis.get("pot")
-      blind_player = @nu_player_order[-1]
+      player_order = $redis.smembers("player_order")
+      blind_player = player_order[-1]
       previous_bet = $redis.get("previous_bet")
 
-      if current_player == blind_player && previous_bet = "0"
-        $redis.set("previous_bet", "0")
+      if current_player.id == blind_player.to_i && previous_bet == "10"
+        $redis.set("previous_bet", 0)
       elsif pot != 15 && (previous_bet == "0")
-        $redis.set("previous_bet", "0")
+        $redis.set("previous_bet", 0)
       end
     end
     next_bet
@@ -63,13 +62,16 @@ class PlayerActionsController < ApplicationController
 
   def fold
     if isAllowedToBet
-      x = eval(@nu_player_order)
+      @nu_player_order.delete("#{current_player.id}")
+      $redis.set("nu_player_order", @nu_player_order)
 
-      x.delete("#{current_player.id}")
+      $redis.srem("player_order", current_player.id)
+      # player_order = $redis.smembers("player_order")
+      # player_order.delete("#{current_player.id}")
 
       TableBroadcastJob.perform_later({
         :type => "BET_EVENT",
-        :payload => {:message => "#{current_player.id} has fold for this round"}
+        :payload => {:message => "#{current_player.id} has folded"}
         })
 
     end
@@ -98,7 +100,7 @@ class PlayerActionsController < ApplicationController
     $redis.set("nu_player_order", @nu_player_order)
 
     next_player_id = @nu_player_order[0].to_i
-    
+
     # $redis.set("pot", @pot + params[:bet].to_i)
     # players = eval(@player_order)
     # next_player = players[players.index(current_player.id) + 1] # if you're the last player don't add one

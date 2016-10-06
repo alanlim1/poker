@@ -25,7 +25,7 @@
   <div id="player_actions">
     <div class="player_actions_child" style="display: none;">
     <div><%= link_to "Check", check_path, remote: true, class: 'check-link' %></div>
-    <div><%= link_to "Call", call_path, remote: true, class: 'call-link' %></div>
+    <div><%= link_to "Call", call_bet_path, remote: true, class: 'call-link' %></div>
     <div><%= link_to "Fold", fold_path, remote: true, class: 'fold-link' %></div>
     <div class="raise">
       <%= form_tag raise_path, remote: true do %>

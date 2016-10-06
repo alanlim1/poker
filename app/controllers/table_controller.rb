@@ -97,7 +97,6 @@ class TableController < ApplicationController
     big_blind.save
 
     $redis.set("pot", blind/2 + blind)
-
   end
 
   def bet
