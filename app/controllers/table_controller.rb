@@ -80,7 +80,7 @@ class TableController < ApplicationController
     key_players = [players[dealer], players[small_blind], players[big_blind]]
     player_order = (players - key_players) + key_players
 
-    # $redis.del("player_order") <------ #WHY WTF IS THIS FOR?
+    # $redis.del("player_order") <------#WHY WTF IS THIS FOR?
     $redis.sadd("player_order", player_order)
   end
 
