@@ -39,7 +39,7 @@ riverReveal = (message) ->
 betEventMessages = (message) -> 
   message_html = "";
   for message in message.message
-    message_html += "<div>#{message}</div>"
+    message_html += ", #{message}"
   $("#messages").append(message_html)
 
 joinTable = () ->

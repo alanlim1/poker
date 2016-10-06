@@ -1,5 +1,5 @@
 class PlayerActionsController < ApplicationController
-  before_action :authenticate_user!
+  before_action :authenticate_player!
 
   def call_bet
     if isAllowedToBet
