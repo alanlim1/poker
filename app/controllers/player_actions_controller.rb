@@ -2,10 +2,36 @@ class PlayerActionsController < ApplicationController
   before_action :authenticate_user!
 
   def call
-    player_order = $redis.smembers("player_order")
+    if isAllowedToBet
+      blind = $redis.get("blind")
+      previous_bet = $redis.get("previous_bet")? $redis.get("previous_bet").to_i : blind
+      bet = previous_bet
+      $redis.set("previous_bet", bet)
+      current_player.account -= bet
+      current_player.save
+
+      pot = $redis.get("pot").to_i
+      $redis.set("pot", pot + bet)
+
+      next_bet
+    end
+
   end
 
   def check
+    binding.pry
+    if isAllowedToBet
+      pot = $redis.get("pot")
+      blind_player = @nu_player_order[-1]
+      previous_bet = $redis.get("previous_bet")
+
+      if current_player == blind_player && previous_bet = "0"
+        $redis.set("previous_bet", "0")
+      elsif pot != 15 && (previous_bet == "0")
+        $redis.set("previous_bet", "0")
+      end
+    end
+    next_bet
   end
 
   def raise
@@ -36,6 +62,18 @@ class PlayerActionsController < ApplicationController
   end
 
   def fold
+    if isAllowedToBet
+      x = eval(@nu_player_order)
+
+      x.delete("#{current_player.id}")
+
+      TableBroadcastJob.perform_later({
+        :type => "BET_EVENT",
+        :payload => {:message => "#{current_player.id} has fold for this round"}
+        })
+
+    end
+    next_bet
   end
 
   def isAllowedToBet
@@ -60,7 +98,7 @@ class PlayerActionsController < ApplicationController
     $redis.set("nu_player_order", @nu_player_order)
 
     next_player_id = @nu_player_order[0].to_i
-
+    
     # $redis.set("pot", @pot + params[:bet].to_i)
     # players = eval(@player_order)
     # next_player = players[players.index(current_player.id) + 1] # if you're the last player don't add one
