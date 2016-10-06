@@ -183,5 +183,5 @@ class TableController < ApplicationController
     $redis.sadd("commoncards", @flop+@turn+@river)
   end
 
-  
+
 end
