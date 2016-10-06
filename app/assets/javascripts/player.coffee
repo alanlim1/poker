@@ -22,7 +22,7 @@ joinUserChannel = () ->
       when "HOLE_EVENT" then dealHoleEvent message.payload
 
 leaveUserChannel = () ->
-  console.log(App.web_notifications_channel)
+  console.log(App.player_channel)
   App.cable.subscriptions.remove(App.player_channel)
 
 $(document).on 'turbolinks:load', () ->
