@@ -1,18 +1,29 @@
 <!DOCTYPE html>
 <html>
+
   <head>
     <title>Poker</title>
+    <%= include_gon %>
     <%= csrf_meta_tags %>
     <%= action_cable_meta_tag %>
 
     <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track': 'reload' %>
-    <%= javascript_include_tag 'application', 'data-turbolinks-track': 'reload' %>
-    <p class="notice"><%= notice %></p>
-    <p class="alert"><%= alert %></p>
+    <%= javascript_include_tag 'https://js.braintreegateway.com/js/braintree-2.28.0.min.js', 'application', 'data-turbolinks-track': 'reload' %>
+    <p class="notice text-center"><%= notice %></p>
+    <p class="alert text-center"><%= alert %></p>
   </head>
 
   <body>
+
+
     <%= render partial: "partials/header"%>
     <%= yield %>
+
   </body>
+
+  <footer>
+    <div class="container">
+      © Poker Dreams 2016
+    </div>
+  </footer>
 </html>

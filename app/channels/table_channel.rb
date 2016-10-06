@@ -1,5 +1,6 @@
 class TableChannel < ApplicationCable::Channel
   def subscribed
+    #TODO: make sure player has enough in his account
     stream_from "table_channel"
     $redis.sadd("players", connection.current_player.id)
     notify_players
@@ -17,6 +18,9 @@ class TableChannel < ApplicationCable::Channel
     player_ids.each do |player_id|
 
       player = Player.find_by(id: player_id)
+      if !player
+        next
+      end
       players.push({:id => player.id, :name => player.email})
     end
 
