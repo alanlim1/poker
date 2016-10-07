@@ -114,6 +114,40 @@ class PlayerActionsController < ApplicationController
         })
   end
 
+  def game_best_hands
+    allholes = $redis.smembers "allholes"
+    player_hole = JSON.parse(allholes)
+    player_hole.each do |player_id, holes|
+      all_player_best_hands.push(:player_id => player_best_hands(player_id))
+    end
+
+    all_player_best_hands.each do |player_id, player_best_hands|
+      choose_best_hands.push(PokerHand.new(player_best_hands))
+        choose_best_hands.each do |best_hands|
+          winner_hands = PokerHand.new([])
+          if best_hands.rank > winner_hands.rank
+            winner_hands = best_hands
+          end
+        end
+    end        
+  end
+
+  def player_best_hands(player)
+    allholes = $redis.smembers "allholes"
+    player_hole = JSON.parse(allholes[0])[player]
+    commoncards = $redis.smembers "commoncards"
+    combined_cards = commoncards.push(player_hole).flatten
+    all_combination = combined_cards.combination(5).to_a
+    all_combination.each_with_index do |x, index|
+      hands = PokerHand.new(all_combination[index])
+      highest_hands = PokerHand.new([])
+        if hands.rank > highest_hands.rank
+          highest_hands = hands
+        end
+    end
+    highest_hands
+  end
+
   def next_bet_if_fold
     next_player_id = @nu_player_order[0].to_i
 
