@@ -4,7 +4,7 @@ joinLeaveEvent = (message) ->
     players_html += "<div id=#{player.id}>#{player.name}</div>"
   $("#players").html(players_html)
 
-  if message.players.length > 2 #TODO: make this check at the server
+  if message.players.length > 1 #TODO: make this check at the server
     $('#start').show()
   else
     $('#start').hide()
@@ -21,25 +21,25 @@ gameStarted = (message) ->
 flopReveal = (message) ->
   flop_html = "";
   for flop in message.flop
-    flop_html += "#{flop}"
+    flop_html += "<div class=\"flop card-#{flop} col-sm-4\"></div>"
   $('.flop').html(flop_html)
 
 turnReveal = (message) ->
   turn_html = "";
   for turn in message.turn
-    turn_html += "#{turn}"
-  $('.turn').html(turn_html)
+    turn_html += "<div class=\"turn card-#{turn} col-sm-6 turn_style\"></div>"
+  $('.turnriver').html(turn_html)
 
 riverReveal = (message) ->
   river_html = "";
   for river in message.river
-    river_html += "#{river}"
-  $('.river').html(river_html)
+    river_html += "<div class=\"river card-#{river} col-sm-6\"></div>"
+  $('.turnriver').html(river_html)
 
 betEventMessages = (message) -> 
   message_html = "";
-  for player_id in message.message
-    message_html += "#{player_id}"
+  for player in message.message
+    message_html += "#{player}"
   $("#messages").append(message_html)
 
 joinTable = () ->

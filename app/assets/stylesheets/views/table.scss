@@ -1,5 +1,33 @@
 #player-hand {
   display: flex;
+  padding-bottom: 20px;
+  margin-left: 15px;
+  padding-top: 20px;
+}
+
+.table_background {
+  background-color: green;
+}
+
+.top_border {
+  border: 2px solid white;
+  padding-bottom: 12px;
+  width: 300px;
+  border-radius: 20px;
+}
+
+.player_actions {
+  display: none;
+}
+
+.player_actions_child {
+  display: flex;
+  justify-content: center;
+  padding-top: 20px;
+}
+
+.turn_style {
+  background-position: 70% 50%;
 }
 
 .card {
@@ -7,7 +35,7 @@
 }
 
 .cards {
-  height: 250px;
+  height: 260px;
 }
 
 .card-Ac {
@@ -268,4 +296,8 @@
 .card-Ks {
   @extend .cards;
   background: url("poker_cards/Ks.png") no-repeat;
+}
+
+.turn_style {
+  background-position: 70% 50%;
 }

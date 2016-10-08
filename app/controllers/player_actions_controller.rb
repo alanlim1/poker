@@ -2,7 +2,8 @@ class PlayerActionsController < ApplicationController
   before_action :authenticate_player!
 
   def call_bet
-    if isAllowedToBet
+    player_order = $redis.smembers("players")
+    if isAllowedToBet && current_player.id != player_order[-2].to_i && current_player.id != player_order[-1].to_i
       blind = $redis.get("blind")
       previous_bet = $redis.get("previous_bet")? $redis.get("previous_bet"): blind
       bet = previous_bet.to_i
@@ -12,14 +13,82 @@ class PlayerActionsController < ApplicationController
 
       pot = $redis.get("pot").to_i
       $redis.set("pot", pot + bet)
-
-      next_bet
+      updated_pot = $redis.get("pot").to_i
 
       TableBroadcastJob.perform_later({
         :type => "BET_EVENT",
-        :payload => {:message => "#{current_player.id} has called the bet of $#{bet}. "}
+        :payload => {:message => "#{current_player.email} has called the bet of $#{bet}. POT: $#{updated_pot}. "}
         })
+
+    blind = $redis.get("blind")
+    previous_bet = $redis.get("previous_bet")? $redis.get("previous_bet"): blind
+    bet = previous_bet.to_i
+
+    elsif isAllowedToBet && current_player.id == player_order[-2].to_i && bet.to_i < 10
+      blind = $redis.get("blind")
+      halfbet = blind.to_i/2
+
+      current_player.account -= halfbet
+      current_player.save
+
+      pot = $redis.get("pot").to_i
+      $redis.set("pot", pot + halfbet)
+      updated_pot = $redis.get("pot").to_i
+
+      TableBroadcastJob.perform_later({
+        :type => "BET_EVENT",
+        :payload => {:message => "The small blind #{current_player.email} has called the bet of $#{halfbet}. POT: $#{updated_pot}. "}
+        })
+
+      previous_bet = $redis.get("previous_bet")? $redis.get("previous_bet"): blind
+      bet = previous_bet.to_i
+
+      if bet > 10
+        blind = $redis.get("blind")
+        halfbet = blind.to_i/2
+        bet = bet - blind.to_i
+        $redis.set("previous_bet", bet)
+
+        current_player.account -= bet
+        current_player.save
+
+        pot = $redis.get("pot").to_i
+        $redis.set("pot", pot + bet)
+        updated_pot = $redis.get("pot").to_i
+
+        TableBroadcastJob.perform_later({
+          :type => "BET_EVENT",
+          :payload => {:message => "The small blind #{current_player.email} has called the bet of $#{bet}. POT: $#{updated_pot}. "}
+          })
+      end
+
+    previous_bet = $redis.get("previous_bet")? $redis.get("previous_bet"): blind
+    bet = previous_bet.to_i
+
+    elsif isAllowedToBet && current_player.id == player_order[-1].to_i
+      if previous_bet.to_i == 10
+        check
+      else
+        blind = $redis.get("blind")
+        previous_bet = $redis.get("previous_bet")? $redis.get("previous_bet"): blind
+        bet = previous_bet.to_i
+        bet = bet - blind.to_i
+        $redis.set("previous_bet", bet)
+
+        current_player.account -= bet
+        current_player.save
+
+        pot = $redis.get("pot").to_i
+        $redis.set("pot", pot + bet)
+        updated_pot = $redis.get("pot").to_i
+
+        TableBroadcastJob.perform_later({
+          :type => "BET_EVENT",
+          :payload => {:message => "The big blind #{current_player.email} has called the bet of $#{bet}. POT: $#{updated_pot}. "}
+          })
+      end
     end
+    next_bet
   end
 
   def check #TODO WHAT HAPPENS IS RAISE RERAISE?!
@@ -31,55 +100,81 @@ class PlayerActionsController < ApplicationController
 
       if current_player.id == blind_player.to_i && previous_bet == "10"
         $redis.set("previous_bet", 0)
-      elsif pot != 15 && (previous_bet == "0")
+        TableBroadcastJob.perform_later({
+        :type => "BET_EVENT",
+        :payload => {:message => "#{current_player.email} has checked. POT: $#{pot}. "}
+        })
+        next_bet
+      elsif pot.to_i >= 15 && (previous_bet == "0")
         $redis.set("previous_bet", 0)
+        TableBroadcastJob.perform_later({
+        :type => "BET_EVENT",
+        :payload => {:message => "#{current_player.email} has checked. POT: $#{pot}. "}
+        })
+        next_bet
+      elsif previous_bet != 0
+        TableBroadcastJob.perform_later({
+        :type => "BET_EVENT",
+        :payload => {:message => "#{current_player.email}, check not available. Bet is called. "}
+        })
+        call_bet ## check & call all always with a checkbox button a la ZYNGA
       end
     end
-    next_bet
   end
 
   def raise_bet
     if isAllowedToBet
-      # player_order = $redis.smembers("player_order")
+      player_order = $redis.smembers("player_order")
       previous_bet = $redis.get("previous_bet")? $redis.get("previous_bet").to_i : nil
       blind = $redis.get("blind").to_i
       bet = params[:bet].to_i
       if(previous_bet)
         if(bet < previous_bet)
-          #Reject bet
-          flash[:danger] = "BET MORE"
+          TableBroadcastJob.perform_later({
+            :type => "BET_EVENT",
+            :payload => {:message => "#{current_player.email} needs to bet more. Learn your math. Bet is called! "}
+            })
+        #TODO: REJECT BET and ALLOW SECOND HIGHER RAISE. how?
+          return call_bet
         end
-      else
-        if(bet < blind)
-          #Reject bet
-          flash[:danger] = "BET MORE"
-        end
+      elsif(bet < blind)
+        TableBroadcastJob.perform_later({
+          :type => "BET_EVENT",
+          :payload => {:message => "#{current_player.email}, raise needs to be more than blind! Math please, bet is called! "}
+          })
+        return call_bet
       end
+
+      # !?!?!?!?!?!?!?!?!??!?!WTAFSJDALSKDJASLKDFJASDLKSAJDSAKL
+      # >>>>>>>>>>>>>
+        #TODO same as above: allow second raise to be more than previous bet
+      #   elsif bet > previous_bet && (current_player.id != player_order[0].to_i)
+      #     pot = $redis.get("pot").to_i
+      #     TableBroadcastJob.perform_later({
+      #       :type => "RERAISE_EVENT",
+      #       :payload => {:message => "#{current_player.email} has re-raised $#{bet}! POT: $#{pot}. "}
+      #       })
+      #   end
+      # end
 
       $redis.set("previous_bet", bet)
       current_player.account -= bet
       current_player.save
       pot = $redis.get("pot").to_i
       $redis.set("pot", pot + bet)
-      next_bet
+      updated_pot = $redis.get("pot").to_i
 
       TableBroadcastJob.perform_later({
         :type => "BET_EVENT",
-        :payload => {:message => "#{current_player.id} has raised $#{bet}! "}
+        :payload => {:message => "#{current_player.email} has raised $#{bet}! POT: $#{updated_pot}. "}
         })
-
-      player_order = $redis.smembers("player_order")
-      if bet > previous_bet && (current_player.id != player_order[0] || player_order[0].to_i)
-        TableBroadcastJob.perform_later({
-          :type => "RERAISE_EVENT",
-          :payload => {:message => "#{current_player.id} has re-raised $#{bet}! "}
-          })
-      end
     end
+    next_bet
   end
 
   def fold
     if isAllowedToBet
+      pot = $redis.get("pot").to_i
       @nu_player_order.delete("#{current_player.id}".to_s)
       $redis.set("nu_player_order", @nu_player_order)
 
@@ -89,14 +184,14 @@ class PlayerActionsController < ApplicationController
 
       TableBroadcastJob.perform_later({
         :type => "BET_EVENT",
-        :payload => {:message => "#{current_player.id} has folded. "}
+        :payload => {:message => "#{current_player.email} has folded. POT: $#{pot}. "}
         })
-
     end
     next_bet_if_fold
   end
 
   def next_bet
+    turnOver
     @nu_player_order.rotate!
     $redis.set("nu_player_order", @nu_player_order)
 
@@ -112,6 +207,107 @@ class PlayerActionsController < ApplicationController
         :type => "BET_EVENT",
         :payload => {:current_player => next_player_id }
         })
+
+    fin
+  end
+
+  def game_best_hands
+    allholes = $redis.smembers "allholes"
+    player_hole = JSON.parse(allholes[0])
+    player_hole.each do |player_id, holes|
+      commoncards = $redis.smembers "commoncards"
+      holes << commoncards
+      holes.flatten
+    end
+    all_player_best_hands = []
+    player_hole.each do |player_id, holes|
+      all_player_best_hands.push(player_id => player_best_hands(player_id))
+    end
+
+    choose_best_hands = []
+    all_player_best_hands.each do |player_cards_hash|
+      player_cards_hash.each do |key, value|
+        choose_best_hands.push(value)
+      end
+    end
+
+      winner_hands = PokerHand.new([])
+      choose_best_hands.each do |x|
+        best_hands = PokerHand.new(x)
+        if best_hands.rank > winner_hands.rank
+          winner_hands = best_hands
+        end
+        winner_hands.cards
+      end
+
+    all_player_best_hands.each do |x|
+      x.key(winner_hands.cards)
+    end
+  end
+
+  def player_best_hands(player)
+    allholes = $redis.smembers "allholes"
+    player_hole = JSON.parse(allholes[0])[player.to_s]
+    commoncards = $redis.smembers "commoncards"
+    combined_cards = commoncards.push(player_hole).flatten
+    all_combination = combined_cards.combination(5).to_a
+    highest_hands = PokerHand.new([])
+    all_combination.each_with_index do |x, index|
+      hands = PokerHand.new(all_combination[index])
+        if hands.rank > highest_hands.rank
+          highest_hands = hands
+        end
+    end
+    highest_hands.cards
+  end
+
+  def next_bet_if_fold
+    next_player_id = @nu_player_order[0].to_i
+    current_bet = $redis.get("previous_bet").to_i
+
+    PlayerBroadcastJob.perform_later(next_player_id, {
+      :type => "BET_EVENT",
+      :payload => {:current_bet => current_bet}
+      })
+
+    TableBroadcastJob.perform_later({
+        :type => "BET_EVENT",
+        :payload => {:current_player => next_player_id }
+        })
+
+    fin
+  end
+
+  def isAllowedToBet
+    player_order = $redis.smembers("player_order")
+
+    if $redis.get("nu_player_order").nil?
+      $redis.set("nu_player_order", player_order)
+    # else
+    #   @nu_player_order = eval($redis.get("nu_player_order"))
+    end
+    @nu_player_order = eval($redis.get("nu_player_order"))
+    current_player.id == @nu_player_order[0].to_i
+  end
+
+  def turnOver
+    $redis.srem("player_order", current_player.id)
+    # binding.pry
+    # player_order = $redis.smembers("player_order")
+    # if @nu_player_order[0].to_i == current_player.id
+    #   player_order.delete("#{current_player.id}")
+    # end
+  end
+
+  def fin
+    flop = $redis.smembers("commoncards")
+    if $redis.get("state") == "FLOP" && $redis.smembers("player_order") == []
+      TableBroadcastJob.perform_later({
+          :type => "FLOP_REVEAL_EVENT",
+          :payload => { :flop => flop}
+        })
+      $redis.set("state", "COMPARE")
+    end
   end
 
   def game_best_hands
@@ -129,7 +325,7 @@ class PlayerActionsController < ApplicationController
             winner_hands = best_hands
           end
         end
-    end        
+    end
   end
 
   def player_best_hands(player)
@@ -148,33 +344,6 @@ class PlayerActionsController < ApplicationController
     highest_hands
   end
 
-  def next_bet_if_fold
-    next_player_id = @nu_player_order[0].to_i
-
-    current_bet = $redis.get("previous_bet").to_i
-
-    PlayerBroadcastJob.perform_later(next_player_id, {
-      :type => "BET_EVENT",
-      :payload => {:current_bet => current_bet}
-      })
-
-    TableBroadcastJob.perform_later({
-        :type => "BET_EVENT",
-        :payload => {:current_player => next_player_id }
-        })
-  end
-
-  def isAllowedToBet
-    player_order = $redis.smembers("player_order")
-
-    if $redis.get("nu_player_order").nil?
-      $redis.set("nu_player_order", player_order)
-    # else
-    #   @nu_player_order = eval($redis.get("nu_player_order"))
-    end
-    @nu_player_order = eval($redis.get("nu_player_order"))
-    current_player.id == @nu_player_order[0].to_i
-  end
 
   # def OLD_next_bet ## LEGACY CODES
   #   @nu_player_order.rotate!

@@ -1,4 +1,4 @@
-/*//
+//
 //
 // .background {
 //   background-image: asset-url("chips.jpeg");
@@ -21,10 +21,15 @@
 //   }
 // }
 
+#messages {
+  color: red;
+  font-style: italic, bold;
+  background-color: white;
+}
 
 .header {
   background-color: white;
-  opacity: 0.5;
+  opacity: 1;
 
   // background: rgba(255,0,0,0.3);
 
@@ -39,7 +44,7 @@
 }
 
 .navbar-default .navbar-brand {
-  color: black;
+  color: blue;
 }
 
 // .app-contents {
@@ -62,6 +67,18 @@
   padding-top: 0.5%;
 }
 
+.footer_background {
+  background-color: green;
+  height: 50px;
+  text-align: center;
+}
+
+.footer_title {
+  color: white;
+  position: relative;
+  top: 10px;
+}
+
 .modal-content  {
     -webkit-border-radius: 0px !important;
     -moz-border-radius: 0px !important;
@@ -73,4 +90,3 @@
 .modal-dialog {
   padding-top: 12%;
 }
-*/
