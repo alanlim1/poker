@@ -21,10 +21,14 @@
 //   }
 // }
 
+.messages {
+  color: white;
+  font: bold;
+}
 
 .header {
   background-color: white;
-  opacity: 0.5;
+  opacity: 1;
 
   // background: rgba(255,0,0,0.3);
 
@@ -35,11 +39,11 @@
 }
 
 .navbar-default .navbar-nav > li > a {
-  color: white;
+  color: black;
 }
 
 .navbar-default .navbar-brand {
-  color: white;
+  color: blue;
 }
 
 // .app-contents {
@@ -63,7 +67,7 @@
 }
 
 .footer_background {
-  background-color: white;
+  background-color: green;
   height: 50px;
   text-align: center;
 }

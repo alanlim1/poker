@@ -4,7 +4,7 @@ joinLeaveEvent = (message) ->
     players_html += "<div id=#{player.id}>#{player.name}</div>"
   $("#players").html(players_html)
 
-  if message.players.length > 2 #TODO: make this check at the server
+  if message.players.length > 1 #TODO: make this check at the server
     $('#start').show()
   else
     $('#start').hide()
