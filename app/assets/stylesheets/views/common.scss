@@ -21,9 +21,10 @@
 //   }
 // }
 
-.messages {
-  color: white;
-  font: bold;
+#messages {
+  color: red;
+  font-style: italic, bold;
+  background-color: white;
 }
 
 .header {

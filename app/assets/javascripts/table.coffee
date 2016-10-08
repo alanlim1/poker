@@ -28,13 +28,13 @@ turnReveal = (message) ->
   turn_html = "";
   for turn in message.turn
     turn_html += "<div class=\"turn card-#{turn} col-sm-6 turn_style\"></div>"
-  $('.turn').html(turn_html)
+  $('.turnriver').html(turn_html)
 
 riverReveal = (message) ->
   river_html = "";
   for river in message.river
     river_html += "<div class=\"river card-#{river} col-sm-6\"></div>"
-  $('.river').html(river_html)
+  $('.turnriver').html(river_html)
 
 betEventMessages = (message) -> 
   message_html = "";
