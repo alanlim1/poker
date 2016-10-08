@@ -23,6 +23,7 @@
   display: flex;
   justify-content: center;
   padding-top: 20px;
+<<<<<<< HEAD
 }
 
 .turn_style {
@@ -295,4 +296,8 @@
 .card-Ks {
   @extend .cards;
   background: url("poker_cards/Ks.png") no-repeat;
+}
+
+.turn_style {
+  background-position: 70% 50%;
 }

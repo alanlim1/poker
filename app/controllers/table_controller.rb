@@ -33,7 +33,6 @@ class TableController < ApplicationController
     fin
   end
 
-
   def fin
     if $redis.get("state") == "FLOP" && $redis.smembers("player_order") == []
       TableBroadcastJob.perform_later({
@@ -82,6 +81,7 @@ class TableController < ApplicationController
     #   # $redis.del("state")
     #   # $redis.flushall
     # end
+      #reveal flop, update pot
   end
 
   def player_turn

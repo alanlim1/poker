@@ -21,7 +21,7 @@ gameStarted = (message) ->
 flopReveal = (message) ->
   flop_html = "";
   for flop in message.flop
-    flop_html += "<div class=\"card card-#{flop} col-sm-2\"></div>"
+    flop_html += "<div class=\"flop card-#{flop} col-sm-4\"></div>"
   $('.flop').html(flop_html)
 
 turnReveal = (message) ->

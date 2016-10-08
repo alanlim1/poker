@@ -1,4 +1,4 @@
-<ul class="right">
+<!-- <ul class="right">
   <%if signed_in?%>
     <li><%=link_to current_player.email, edit_player_registration_path%></li>
     <li><%=link_to "Logout", destroy_player_session_path, method: :delete%></li>
@@ -6,5 +6,9 @@
     <li><%=link_to "Register", new_player_registration_path%></li>
     <li><%=link_to "Login", new_player_session_path%></li>
   <%end%>
+
     <li><%=link_to "New Game", flush_redis_path %></li>
 </ul>
+=======
+    <li><%=link_to "Flush Redis", flush_redis_path %></li>
+</ul> -->
