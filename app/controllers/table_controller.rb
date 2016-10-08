@@ -38,7 +38,17 @@ class TableController < ApplicationController
     if $redis.get("state") == "FLOP" && $redis.smembers("player_order") == []
       TableBroadcastJob.perform_later({
           :type => "FLOP_REVEAL_EVENT",
-          :payload => { :flop => @flop + @turn + @river }
+          :payload => { :flop => @flop }
+        })
+
+      TableBroadcastJob.perform_later({
+          :type => "TURN_REVEAL_EVENT",
+          :payload => { :flop => @turn }
+        })
+
+      TableBroadcastJob.perform_later({
+          :type => "RIVER_REVEAL_EVENT",
+          :payload => { :flop => @river }
         })
       $redis.set("state", "COMPARE")
     end
@@ -179,6 +189,9 @@ class TableController < ApplicationController
     @river = Array.new(1) { @redisdeck.shift }
 
     $redis.sadd("commoncards", @flop+@turn+@river)
+    $redis.sadd("flop", @flop)
+    $redis.sadd("turn", @turn)
+    $redis.sadd("river", @river)
   end
 
 
