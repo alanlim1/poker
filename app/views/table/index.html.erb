@@ -16,7 +16,8 @@
         <%= link_to "Start", start_path, remote: true, class: 'start-link btn btn-primary' %>
       </span>
       <div></div><br />
-      <div class="top_border">
+
+      <div class="top_border container-fluid">
         <h3> Players at table: </h3>
         <div id="players">
         </div>
@@ -35,7 +36,7 @@
       </div>
     </div>
 
-    <div id="player_actions row">
+    <div id="player_actions">
       <div class="player_actions_child" style="display: none;">
         <div><%= link_to "Check", check_path, remote: true, class: 'check-link btn btn-primary' %></div>
         <div><%= link_to "Call", call_bet_path, remote: true, class: 'call-link btn btn-warning' %></div>
