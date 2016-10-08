@@ -1,26 +1,3 @@
-//
-//
-// .background {
-//   background-image: asset-url("chips.jpeg");
-//   // height: 100vh;
-//   // width: 100%;
-//   background-position: 50% 50%;
-//   background-repeat: no-repeat;
-//   background-size: cover;
-//   // display: flex;
-//   // align-items: center;
-//   // justify-content: center;
-// }
-//
-// .header {
-//   background: rgba(255,0,0,0.3);
-//
-//   a, a:visited {
-//     color: white;
-//
-//   }
-// }
-
 #messages {
   color: red;
   font-style: italic, bold;
@@ -29,14 +6,7 @@
 
 .header {
   background-color: white;
-  opacity: 1;
-
-  // background: rgba(255,0,0,0.3);
-
-  // a, a:visited {
-  //   color: white;
-  //
-  // }
+  opacity: 0.8;
 }
 
 .navbar-default .navbar-nav > li > a {
@@ -44,16 +14,8 @@
 }
 
 .navbar-default .navbar-brand {
-  color: blue;
+  color: black;
 }
-
-// .app-contents {
-//   position: absolute;
-//   top: 0;
-//   left: 0;
-//   height: 100%;
-//   width: 100%;
-// }
 
 .navbar {
   margin-bottom: 0;
@@ -68,7 +30,7 @@
 }
 
 .footer_background {
-  background-color: green;
+  background-color: maroon;
   height: 50px;
   text-align: center;
 }

@@ -3,10 +3,28 @@
   padding-bottom: 20px;
   margin-left: 15px;
   padding-top: 20px;
+  padding-left: 100px;
+  padding-right: 30px;
 }
 
 .table_background {
   background-color: green;
+}
+
+#joined {
+  padding-bottom: 20px;
+}
+
+.join-link.btn.btn-primary {
+  margin-top: 20px;
+}
+
+.start-link.btn.btn-warning {
+  margin-top: 20px;
+}
+
+.leave-link.btn.btn-danger {
+  margin-top: 20px;
 }
 
 .top_border {
@@ -14,16 +32,30 @@
   padding-bottom: 12px;
   width: 300px;
   border-radius: 20px;
+  margin-top: 20px;
 }
 
-.player_actions {
-  display: none;
+#commoncards {
+  padding-top: 20px;
 }
 
 .player_actions_child {
   display: flex;
   justify-content: center;
   padding-top: 20px;
+  padding-bottom: 10px;
+}
+
+.check-link.btn.btn-primary {
+  margin-right: 5px;
+}
+
+.call-link.btn.btn-warning {
+  margin-right: 5px;
+}
+
+.fold-link.btn.btn-danger {
+  margin-right: 20px;
 }
 
 .turn_style {

@@ -14,6 +14,7 @@ reRaiseEvent = (payload) =>
 
 hideActions = () =>
   $("#player_actions").hide()
+  $(".player_actions_child").hide()
 
 joinUserChannel = () ->
   App.player_channel = App.cable.subscriptions.create {
@@ -28,11 +29,10 @@ joinUserChannel = () ->
 
   received: (message) ->
     console.log(message)
-    # $('#commoncards').append message['message']
     switch message.type
       when "HOLE_EVENT" then dealHoleEvent message.payload
       when "BET_EVENT" then doBet message.payload
-      when "RERAISE_EVENT" then reRaiseEvent message.payload
+      # when "RERAISE_EVENT" then reRaiseEvent message.payload
 
 leaveUserChannel = () ->
   console.log(App.player_channel)
@@ -41,7 +41,7 @@ leaveUserChannel = () ->
 $(document).on 'turbolinks:load', () ->
   $('.join-link').on 'ajax:beforeSend', joinUserChannel
   $('.raise').on 'ajax:success', hideActions
-  $('.fold-link').on 'ajax:success', hideActions
-  $('.call-link').on 'ajax:success', hideActions
-  $('.check-link').on 'ajax:success', hideActions
+  $('.fold-link btn btn-danger').on 'ajax:success', hideActions
+  $('.call-link btn-warning').on 'ajax:success', hideActions
+  $('.check-link btn btn-primary').on 'ajax:success', hideActions
   # $('.leave-game-link').on 'click', leaveUserChannel
