@@ -28,18 +28,20 @@ class TableController < ApplicationController
       player_turn
       set_pot
       bet #commoncards given but not revealed
-      # $redis.set("state", "FLOP")
+      $redis.set("state", "FLOP")
     end
+    fin
+  end
 
-    # if $redis.get("state") == "FLOP"
-    #   TableBroadcastJob.perform_later({
-    #       :type => "FLOP_REVEAL_EVENT",
-    #       :payload => { :flop => @flop }
-    #     })
-    #   #reveal flop, update pot
-    #   bet
-    #   $redis.set("state", "TURN")
-    # end
+
+  def fin
+    if $redis.get("state") == "FLOP" && $redis.smembers("player_order") == []
+      TableBroadcastJob.perform_later({
+          :type => "FLOP_REVEAL_EVENT",
+          :payload => { :flop => @flop + @turn + @river }
+        })
+      $redis.set("state", "COMPARE")
+    end
     #
     # if $redis.get("state") == "TURN"
     #   TableBroadcastJob.perform_later({
@@ -114,13 +116,11 @@ class TableController < ApplicationController
     PlayerBroadcastJob.perform_later(next_player_id, {
         :type => "BET_EVENT",
         :payload => {
-          :message => "Place your bets, please. "
+          :message => "It's your turn. "
         }
       })
-    #WHAT IF SOMEONE RAISES THE BET?
-      # if player_action == "call" || "raise" || "fold"
-        #do the action and go next, if bet is raised>!>!> then WHAT!!!?!?!??!?!
-      # end
+
+    # if player_order == nil || []
   end
 
   def game_ended

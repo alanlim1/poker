@@ -21,7 +21,7 @@ gameStarted = (message) ->
 flopReveal = (message) ->
   flop_html = "";
   for flop in message.flop
-    flop_html += "#{flop}"
+    flop_html += "<div class=\"card card-#{flop} col-sm-12\"></div>"
   $('.flop').html(flop_html)
 
 turnReveal = (message) ->
@@ -38,8 +38,8 @@ riverReveal = (message) ->
 
 betEventMessages = (message) -> 
   message_html = "";
-  for player_id in message.message
-    message_html += "#{player_id}"
+  for player in message.message
+    message_html += "#{player}"
   $("#messages").append(message_html)
 
 joinTable = () ->

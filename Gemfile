@@ -34,6 +34,7 @@ gem 'hiredis'
 gem "braintree", "~> 2.66.0"
 gem "figaro"
 gem 'gon'
+gem 'ruby-poker'
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development
 
