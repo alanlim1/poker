@@ -212,54 +212,70 @@ class PlayerActionsController < ApplicationController
   end
 
   def game_best_hands
+
     allholes = $redis.smembers "allholes"
     player_hole = JSON.parse(allholes[0])
+
+    all_player_best_hands = Hash.new
     player_hole.each do |player_id, holes|
-      commoncards = $redis.smembers "commoncards"
-      holes << commoncards
-      holes.flatten
-    end
-    all_player_best_hands = []
-    player_hole.each do |player_id, holes|
-      all_player_best_hands.push(player_id => player_best_hands(player_id))
+      all_player_best_hands[player_id] = player_best_hands(player_id)
     end
 
     choose_best_hands = []
-    all_player_best_hands.each do |player_cards_hash|
-      player_cards_hash.each do |key, value|
-        choose_best_hands.push(value)
-      end
+    all_player_best_hands.each do |key, value|
+      choose_best_hands.push(value)
     end
 
-      winner_hands = PokerHand.new([])
-      choose_best_hands.each do |x|
-        best_hands = PokerHand.new(x)
-        if best_hands.rank > winner_hands.rank
-          winner_hands = best_hands
-        end
-        winner_hands.cards
+    winner_hands = PokerHand.new([])
+    choose_best_hands.each do |x|
+      best_hands = PokerHand.new(x)
+      if best_hands.rank > winner_hands.rank
+        winner_hands = best_hands
       end
-
-    all_player_best_hands.each do |x|
-      x.key(winner_hands.cards)
+      winner_hands.cards
     end
+
+    winner_id = all_player_best_hands.key(winner_hands.cards)
+    winner_player = Player.find_by(winner_id)
+
+    pot = $redis.get "pot"
+    winner_player.account += pot
+    winner_player.save
+
+    TableBroadcastJob.perform_later({
+      :type => "WINNER_EVENT"
+      :payload => "#{winner_player.email} has won the round and #{pot} richer!!"
+      })
   end
 
   def player_best_hands(player)
     allholes = $redis.smembers "allholes"
-    player_hole = JSON.parse(allholes[0])[player.to_s]
+    player_hole = JSON.parse(allholes[0])["1"]
     commoncards = $redis.smembers "commoncards"
     combined_cards = commoncards.push(player_hole).flatten
     all_combination = combined_cards.combination(5).to_a
-    highest_hands = PokerHand.new([])
+    highest_hands = ""
     all_combination.each_with_index do |x, index|
-      hands = PokerHand.new(all_combination[index])
-        if hands.rank > highest_hands.rank
-          highest_hands = hands
+        if all_combination[index].contains_all? player_hole
+          hands = PokerHand.new(all_combination[index])
+          if hands.rank > PokerHand.new(highest_hands).rank
+            highest_hands = hands.cards
+          end
         end
     end
-    highest_hands.cards
+    highest_hands
   end
+
+  def contains_all? other
+    other = other.dup
+    each{|e| if i = other.index(e) then other.delete_at(i) end}
+    other.empty?
+  end
+
+  # all_combination.each_with_index do |x, index|
+  #    puts "#{index} : #{PokerHand.new(all_combination[index]).rank}"
+  # end
+
 
   def next_bet_if_fold
     next_player_id = @nu_player_order[0].to_i
